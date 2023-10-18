@@ -1,0 +1,3 @@
+[cmd_duration]
+show_milliseconds = true
+min_time = 15_000
