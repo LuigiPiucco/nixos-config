@@ -1,22 +1,31 @@
 {
-  nix.daemonIOSchedClass = "idle";
-  nix.daemonCPUSchedPolicy = "idle";
+  nix.channel.enable = false;
+  nix.daemonIOSchedClass = "best-effort";
+  nix.daemonIOSchedPriority = 2;
+  nix.daemonCPUSchedPolicy = "other";
   nix.settings = {
+    allowed-users = ["@users"];
+    auto-optimise-store = true;
+    cores = 8;
+    extra-experimental-features = [
+      "ca-derivations"
+      "flakes"
+      "nix-command"
+      "no-url-literals"
+      "repl-flake"
+    ];
+    keep-derivations = false;
+    keep-outputs = false;
+    max-jobs = 8;
+    print-missing = true;
+    pure-eval = true;
+    restrict-eval = true;
     sandbox = true;
     trusted-users = ["root" "@wheel"];
-    max-jobs = 8;
-    auto-optimise-store = true;
-    system-features = ["nixos-test" "benchmark" "big-parallel" "kvm"];
-    extra-experimental-features = ["nix-command" "flakes" "repl-flake"];
-    allowed-users = ["@wheel"];
+    use-xdg-base-directories = true;
   };
-  nix.extraOptions = ''
-    min-free = 536870912
-    keep-outputs = true
-    keep-derivations = true
-    fallback = true
-  '';
   nix.gc = {
+    automatic = true;
     dates = "weekly";
     options = "--delete-older-than 2d";
     persistent = true;

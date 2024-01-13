@@ -1,44 +1,51 @@
-{ lib, pkgs, ... }:
+{ lib, config, pkgs, inputs, utils, ... }:
 {
-  services.dbus.apparmor = "enabled";
-  security.apparmor.enable = true;
-  security.polkit.enable = true;
-  security.sudo.wheelNeedsPassword = true;
-  security.wrappers.pkexec.permissions = "a+rx,u+w";
-  security.wrappers.polkit-agent-helper-1.permissions = "a+rx,u+w";
+  imports = lib.optional (config.home-manager.users ? "luigi") {
+    home-manager.users.luigi = {
+      gtk = {
+        enable = true;
+        font = {
+          package = pkgs.iosevka;
+          name = "Iosevka Regular";
+        };
+        iconTheme = {
+          package = pkgs.papirus-icon-theme;
+          name = "Papirus";
+        };
+      };
+
+      qt = {
+        enable = true;
+        platformTheme = "kde";
+        style.name = "Breeze-Dark";
+      };
+    };
+  } ++ lib.optional (config.home-manager.users ? "pietro" ) {
+    home-manager.users.pietro = {
+      gtk = {
+        enable = true;
+        font = {
+          package = pkgs.iosevka;
+          name = "Iosevka Regular";
+        };
+        iconTheme = {
+          package = pkgs.papirus-icon-theme;
+          name = "Papirus";
+        };
+      };
+
+      qt = {
+        enable = true;
+        platformTheme = "kde";
+        style.name = "Breeze-Dark";
+      };
+    };
+  };
 
   environment = {
     systemPackages = with pkgs; [
       config.services.emacs.package
-      binutils
-      coreutils
-      curl
-      dnsutils
-      bottom
-      manix
-      whois
-      bat
-      eza
-      procs
-      usbutils
       epdfview
-      (nix-direnv.override {enableFlakes = true;})
-      starship
-      direnv
-      fd
-      git
-      jq
-      ripgrep
-      python3
-      libtool
-      bat
-      git-lfs
-      zoxide
-      man-pages
-      stdmanpages
-      tio
-      git-filter-repo
-      socat
       dconf
       egl-wayland
       freetype
@@ -51,6 +58,7 @@
       libsForQt5.kiconthemes
       libsForQt5.kirigami2
       libsForQt5.polkit-kde-agent
+      libsForQt5.systemsettings
       libsForQt5.qt5.qtbase
       libsForQt5.qt5.qtdeclarative
       libsForQt5.qt5.qtgraphicaleffects
@@ -59,100 +67,23 @@
       libsForQt5.qt5ct
       libsForQt5.qtstyleplugin-kvantum
       libsForQt5.qtstyleplugins
-      p7zip
       papirus-icon-theme
       qt6.qtbase
       qt6.qtwayland
-      unrar
-      xdg-dbus-proxy
       keepassxc
-      libsecret
       polkit-kde-agent
     ];
 
     sessionVariables = {
       EDITOR = "emacsclient -a ''";
       VISUAL = "emacsclient -a ''";
-      PAGER = "less";
-      STARSHIP_CONFIG = ../data/starship.toml;
       QT_AUTO_SCREEN_SCALE_FACTOR = "1";
       QT_QPA_PLATFORM = "wayland;xcb";
       QT_QPA_PLATFORMTHEME = "gtk";
       GDK_BACKEND = "wayland,xcb";
       CLUTTER_BACKEND = "wayland";
-      _JAVA_AWT_WM_NONREPARENTING = "1";
-      GTK_THEME = "Breeze-Dark";
-      GTK_USE_PORTAL = "0";
-      GDK_SCALE = "1";
-      XCURSOR_THEME = "Breeze_cursors";
-      XCURSOR_SIZE = "24";
+      GTK_USE_PORTAL = "1";
     };
-
-    shellAliases = {
-      top = "btm";
-      nrb = "nixos-rebuild --use-remote-sudo";
-      ctl = "systemctl";
-      stl = "sudo systemctl";
-      utl = "systemctl --user";
-      jtl = "journalctl";
-      ls = "eza";
-      l = "ls -lhg --git";
-      la = "l -a";
-      t = "l -T";
-      ta = "la -T";
-
-      less = "bat --paging=auto --color=always --italic-text=always --wrap=never --style=auto";
-
-      ps = "procs";
-    };
-  };
-
-  programs.command-not-found.enable = false;
-
-  programs.fish = {
-    enable = true;
-    shellInit = ''
-      echo "$(${pkgs.zoxide}/bin/zoxide init fish)" | source
-    '';
-    interactiveShellInit = ''
-      function vterm_printf
-          printf "\e]%s\e\\" "$1"
-      end
-
-      if [ "$INSIDE_EMACS" = 'vterm' ]
-        function clear
-          vterm_printf "51;Evterm-clear-scrollback";
-          tput clear;
-        end
-      end
-
-      function fish_title
-        hostname
-        echo ":"
-        prompt_pwd
-      end
-
-      function vterm_cmd --description 'Run an Emacs command among the ones been defined in vterm-eval-cmds.'
-        set -l vterm_elisp ()
-        for arg in $argv
-          set -a vterm_elisp (printf '"%s" ' (string replace -a -r '([\\\\"])' '\\\\\\\\$1' $arg))
-        end
-        vterm_printf '51;E'(string join "" $vterm_elisp)
-      end
-
-      echo "$(${pkgs.direnv}/bin/direnv hook fish)" | source
-    '';
-    promptInit = ''
-      echo "$(${pkgs.starship}/bin/starship init fish)" | source
-      function vterm_prompt_end;
-        vterm_printf '51;A'(whoami)'@'(hostname)':'(pwd)
-      end
-      functions --copy fish_prompt vterm_old_fish_prompt
-      function fish_prompt --description 'Write out the prompt; do not replace this; Instead, put this at end of your file.'
-        printf "%b" (string join "\n" (vterm_old_fish_prompt))
-        vterm_prompt_end
-      end
-    '';
   };
 
   documentation = let
@@ -166,10 +97,15 @@
 
   services.emacs = {
     defaultEditor = true;
-    package = pkgs.emacs-git.pkgs.withPackages (epkgs:
-      with builtins;
+    package = let
+      epackages = inputs.emacs-overlay.packages.x86_64-linux;
+      elib = inputs.emacs-overlay.lib.x86_64-linux;
+      epkgs = elib.emacsPackagesFor epackages.emacs-pgtk;
+    in epkgs.emacsWithPackages (epkgs:
       with epkgs; [
+        emacsql
         vterm
+        pdf-tools
       ]
     );
   };
@@ -185,7 +121,7 @@
     fontconfig.subpixel.rgba = "rgb";
     fontconfig.subpixel.lcdfilter = "light";
     fontconfig.hinting.enable = true;
-    fontconfig.defaultFonts.monospace = ["Iosevka"];
+    fontconfig.defaultFonts.monospace = ["Iosevka" "Fira Code "];
     fontconfig.defaultFonts.serif = ["Iosevka Etoile"];
     fontconfig.defaultFonts.sansSerif = ["Iosevka"];
     fontconfig.defaultFonts.emoji = ["Noto Color Emoji" "Noto Sans Nerd Font"];
@@ -199,15 +135,21 @@
     in
       iosevkas
       ++ [
+        sarasa-gothic
+        fira-code
+        fira-code-symbols
+        fira-code-nerdfont
         unicode-emoji
-        nerdfonts
+        unicode-character-database
+        ucs-fonts
+        unifont
       ];
   };
 
   gtk.iconCache.enable = true;
 
   services.xserver = {
-    enable = true;
+    enable = false;
     updateDbusEnvironment = true;
 
     desktopManager = {
@@ -224,27 +166,8 @@
 
   xdg.portal = {
     enable = true;
+    config.prefered.default = ["kde"];
     extraPortals = with pkgs; [xdg-desktop-portal-kde];
     xdgOpenUsePortal = true;
-  };
-
-  i18n = {
-    supportedLocales = [
-      "en_US.UTF-8/UTF-8"
-      "pt_BR.UTF-8/UTF-8"
-      "ja_JP.UTF-8/UTF-8"
-      "ja_JP.EUC-JP/EUC-JP"
-    ];
-    defaultLocale = "en_US.UTF-8";
-  };
-
-  console = {
-    font = "Lat2-Terminus16";
-    keyMap = "us-acentos";
-  };
-
-  time = {
-    timeZone = "America/Sao_Paulo";
-    hardwareClockInLocalTime = true;
   };
 }

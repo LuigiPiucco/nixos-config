@@ -1,12 +1,19 @@
 {
   wsl = {
     enable = true;
+    useWindowsDriver = true;
     nativeSystemd = true;
-    defaultUser = "luigi";
     startMenuLaunchers = true;
-    wslConf.automount.root = "/mnt";
+    wslConf = {
+      automount.root = "/mnt";
+      network = {
+        generateResolvConf = false;
+        generateHosts = true;
+      };
+    };
+    usbip = {
+      enable = true;
+      autoAttach = [ "1-2" "1-3" "1-5" "1-6" ];
+    };
   };
-
-  services.dbus.apparmor = "enabled";
-  security.apparmor.enable = true;
 }

@@ -1,3 +1,14 @@
 [cmd_duration]
 show_milliseconds = true
-min_time = 15_000
+min_time = 8_000
+
+[directory]
+style = "cyan"
+before_repo_root_style = "grey"
+repo_root_style = "bold cyan"
+truncation_symbol = "(etc.)/"
+
+[direnv]
+disabled = false
+detect_files = [".envrc", ".env"]
+detect_folders = [".direnv"]

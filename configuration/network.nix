@@ -3,5 +3,7 @@
 {
   networking.firewall.enable = false;
   networking.nftables.enable = false;
-  networking.hostName = "WSLG-LUIGI";
+  networking.nameservers = ["1.1.1.1" "1.0.0.1"];
+
+  systemd.services.systemd-resolved.enable = true;
 }
