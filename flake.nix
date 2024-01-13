@@ -18,7 +18,13 @@
     emacs-overlay.url = "github:nix-community/emacs-overlay";
   };
 
-  outputs = inputs: {
-    nixosConfigurations.x86_64-linux.WSLG-LUIGI = import ./configuration inputs;
+  outputs = inputs: let
+    nixos = import "${inputs.nixpkgs}/nixos";
+  in {
+    inherit inputs;
+    nixosConfigurations.WSLG-LUIGI = nixos {
+      configuration = import ./configuration inputs;
+      system = "x86_64-linux";
+    };
   };
 }
