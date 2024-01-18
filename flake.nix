@@ -13,7 +13,10 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
     home.url = "github:nix-community/home-manager";
+    home.inputs.nixpkgs.follows = "nixpkgs";
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
+    lanzaboote.url = "github:nix-community/lanzaboote";
+    lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
 
     emacs-overlay.url = "github:nix-community/emacs-overlay";
 
@@ -21,26 +24,24 @@
   };
 
   outputs = inputs: let
-    nixos = import "${inputs.nixpkgs}/nixos";
-    minargs = inputs // {minimal = true;};
-    maxargs = inputs // {minimal = false;};
+    inherit (inputs.nixpkgs.lib) nixosSystem;
+    config = import ./configuration;
   in {
     inherit inputs;
     nixosConfigurations = {
-      WSLG-LUIGI = nixos {
-        configuration = import ./configuration/wslg-luigi maxargs;
+      wslg-pietro = nixosSystem {
+        modules = [config];
+        specialArgs = {inherit inputs; wsl = true; mainUser = "pietro";};
         system = "x86_64-linux";
       };
-      WSLG-PIETRO = nixos {
-        configuration = import ./configuration/wslg-pietro maxargs;
+      wslg-luigi = nixosSystem {
+        modules = [config];
+        specialArgs = {inherit inputs; wsl = true; mainUser = "luigi";};
         system = "x86_64-linux";
       };
-      WSL-LUIGI = nixos {
-        configuration = import ./configuration/wslg-luigi minargs;
-        system = "x86_64-linux";
-      };
-      WSL-PIETRO = nixos {
-        configuration = import ./configuration/wslg-pietro minargs;
+      linuxg-luigi = nixosSystem {
+        modules = [config];
+        specialArgs = {inherit inputs; wsl = false; mainUser = "luigi";};
         system = "x86_64-linux";
       };
     };

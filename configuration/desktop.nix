@@ -1,82 +1,27 @@
-{ lib, config, pkgs, inputs, utils, ... }:
+{ lib, config, pkgs, inputs, utils, wsl, ... }:
 {
-  imports = lib.optional (config.home-manager.users ? "luigi") {
-    home-manager.users.luigi = {
-      gtk = {
-        enable = true;
-        font = {
-          package = pkgs.iosevka;
-          name = "Iosevka Regular";
-        };
-        iconTheme = {
-          package = pkgs.papirus-icon-theme;
-          name = "Papirus";
-        };
-      };
-
-      qt = {
-        enable = true;
-        platformTheme = "kde";
-        style.name = "Breeze-Dark";
-      };
-    };
-  } ++ lib.optional (config.home-manager.users ? "pietro" ) {
-    home-manager.users.pietro = {
-      gtk = {
-        enable = true;
-        font = {
-          package = pkgs.iosevka;
-          name = "Iosevka Regular";
-        };
-        iconTheme = {
-          package = pkgs.papirus-icon-theme;
-          name = "Papirus";
-        };
-      };
-
-      qt = {
-        enable = true;
-        platformTheme = "kde";
-        style.name = "Breeze-Dark";
-      };
-    };
-  };
+  qt.enable = true;
+  programs.dconf.enable = true;
 
   environment = {
     systemPackages = with pkgs; [
       config.services.emacs.package
       epdfview
-      dconf
       egl-wayland
       freetype
       glib
       gsettings-desktop-schemas
-      libsForQt5.breeze-gtk
-      libsForQt5.breeze-icons
-      libsForQt5.breeze-qt5
-      libsForQt5.kdialog
-      libsForQt5.kiconthemes
-      libsForQt5.kirigami2
-      libsForQt5.polkit-kde-agent
-      libsForQt5.systemsettings
-      libsForQt5.qt5.qtbase
-      libsForQt5.qt5.qtdeclarative
-      libsForQt5.qt5.qtgraphicaleffects
-      libsForQt5.qt5.qtquickcontrols
-      libsForQt5.qt5.qtwayland
-      libsForQt5.qt5ct
-      libsForQt5.qtstyleplugin-kvantum
-      libsForQt5.qtstyleplugins
       papirus-icon-theme
       qt6.qtbase
       qt6.qtwayland
       keepassxc
       polkit-kde-agent
+      alacritty
     ];
 
-    sessionVariables = {
-      EDITOR = "emacsclient -a ''";
-      VISUAL = "emacsclient -a ''";
+    variables = {
+      EDITOR = "emacsclient -a 'emacs'";
+      VISUAL = "emacsclient -a 'emacs'";
       QT_AUTO_SCREEN_SCALE_FACTOR = "1";
       QT_QPA_PLATFORM = "wayland;xcb";
       QT_QPA_PLATFORMTHEME = "gtk";
@@ -121,10 +66,10 @@
     fontconfig.subpixel.rgba = "rgb";
     fontconfig.subpixel.lcdfilter = "light";
     fontconfig.hinting.enable = true;
-    fontconfig.defaultFonts.monospace = ["Iosevka" "Fira Code "];
+    fontconfig.defaultFonts.monospace = ["Iosevka" "Fira Code"];
     fontconfig.defaultFonts.serif = ["Iosevka Etoile"];
-    fontconfig.defaultFonts.sansSerif = ["Iosevka"];
-    fontconfig.defaultFonts.emoji = ["Noto Color Emoji" "Noto Sans Nerd Font"];
+    fontconfig.defaultFonts.sansSerif = ["Iosevka Curly"];
+    fontconfig.defaultFonts.emoji = ["Fira Code Symbol" "FiraCode Nerd Font"];
 
     packages = with pkgs; let
       iosevkas = map (variant: iosevka-bin.override {inherit variant;}) [
@@ -149,25 +94,50 @@
   gtk.iconCache.enable = true;
 
   services.xserver = {
-    enable = false;
+    enable = true;
+    autorun = !wsl;
     updateDbusEnvironment = true;
+    excludePackages = with pkgs; [xterm];
 
     desktopManager = {
       runXdgAutostartIfNone = true;
       gnome.enable = false;
-      plasma5.enable = false;
+      plasma5 = {
+        enable = true;
+        useQtScaling = true;
+      };
     };
 
-    displayManager = {
-      lightdm.enable = false;
-      gdm.enable = lib.mkDefault false;
+    displayManager.sddm = {
+      enable = !wsl;
+      wayland.enable = true;
+    };
+  } // lib.optionalAttrs (!wsl) {
+    videoDrivers = ["nvidia" "modesetting"];
+
+    libinput = {
+      touchpad = {
+        tappingButtonMap = "lrm";
+        sendEventsMode = "disabled-on-external-mouse";
+        disableWhileTyping = true;
+      };
     };
   };
 
   xdg.portal = {
     enable = true;
-    config.prefered.default = ["kde"];
-    extraPortals = with pkgs; [xdg-desktop-portal-kde];
+    config.common.default = ["kde" "gtk"];
+    extraPortals = with pkgs; [xdg-desktop-portal-kde xdg-desktop-portal-gtk];
     xdgOpenUsePortal = true;
+  };
+
+  services.pipewire = {
+    enable = true;
+    audio.enable = true;
+    pulse.enable = true;
+    jack.enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    wireplumber.enable = true;
   };
 }

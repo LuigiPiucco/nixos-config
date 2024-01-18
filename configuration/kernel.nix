@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, ... }:
+{ lib, config, pkgs, inputs, wsl, ... }:
 {
   boot = {
     kernelPackages = let
@@ -22,10 +22,8 @@
         kernelPatches = [];
       };
     in
-      pkgs.linuxPackagesFor wsl-kernel;
+      if wsl then pkgs.linuxPackagesFor wsl-kernel else pkgs.linuxKernel.packages.linux_zen;
     kernelModules = ["ftdi_sio" "usbserial" "usbcore" "ch9344" "usbip"];
   };
-  environment.systemPackages = [
-    config.boot.kernelPackages.usbip
-  ];
+  environment.systemPackages = lib.optional wsl config.boot.kernelPackages.usbip;
 }

@@ -1,8 +1,6 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, wsl, mainUser, ... }:
 
 {
-  wsl.defaultUser = "luigi";
-
   users.users.root.hashedPassword = "$6$AuFJcsrir3QGAuqD$XavJkb/EsihqfAZLX86USxjX/i9mxRNiDi.e36vNSwKIsSjY9XbyBrVwwgR37X2uSrbpeWSbmBvOcnv2podCM/";
   users.users.luigi = {
     hashedPassword = "$6$AuFJcsrir3QGAuqD$XavJkb/EsihqfAZLX86USxjX/i9mxRNiDi.e36vNSwKIsSjY9XbyBrVwwgR37X2uSrbpeWSbmBvOcnv2podCM/";
@@ -26,7 +24,25 @@
 
   home-manager.users.luigi = let
     inherit (config.services) emacs;
-  in {config, pkgs, ...}: {
+  in {config, osConfig, pkgs, ...}: {
+    gtk = {
+      enable = true;
+      font = {
+        package = pkgs.iosevka;
+        name = "Iosevka Regular";
+      };
+      iconTheme = {
+        package = pkgs.papirus-icon-theme;
+        name = "Papirus";
+      };
+    };
+
+    qt = {
+      enable = true;
+      platformTheme = "kde";
+      style.name = "Breeze-Dark";
+    };
+
     editorconfig = {
       enable = true;
       settings = {
@@ -41,6 +57,7 @@
         "*.{js,ts,jsx,tsx}".indent_size = 2;
         "*.{json,yaml,yml}".indent_size = 2;
         "*.el".indent_size = 2;
+        "*.nix".indent_size = 2;
       };
     };
 
@@ -106,16 +123,33 @@
         end
         functions --copy fish_prompt vterm_old_fish_prompt
         function fish_prompt --description 'Write out the prompt; do not replace this; Instead, put this at end of your file.'
-          printf "%b" (string join "\n" (vterm_old_fish_prompt))
+          printf "%b" (vterm_old_fish_prompt)
           vterm_prompt_end
         end
       '';
     };
     programs.less.enable = true;
     programs.ripgrep.enable = true;
-    programs.zoxide = {
+    programs.zoxide.enable = true;
+    programs.starship = {
       enable = true;
-      enableFishIntegration = true;
+      settings = {
+        cmd_duration = {
+          show_milliseconds = true;
+          min_time = 8000;
+        };
+        directory = {
+          style = "cyan";
+          before_repo_root_style = "black";
+          repo_root_style = "bold cyan";
+          truncation_symbol = "(etc.)/";
+        };
+        direnv = {
+          disabled = false;
+          detect_files = [".envrc" ".env"];
+          detect_folders = [".direnv"];
+        };
+      };
     };
 
     programs.git = {
@@ -157,22 +191,28 @@
         enable: true
     '';
 
+    nix = {
+      enable = true;
+      inherit (osConfig.nix) settings;
+    };
+
     programs.gpg = {
       enable = true;
-      homedir = "${config.xdg.configHome}/gnupg";
+      homedir = "${config.xdg.dataHome}/gnupg";
     };
     services.gpg-agent = {
       enable = true;
       enableExtraSocket = true;
       enableSshSupport = true;
       enableFishIntegration = true;
-      pinentryFlavor = null;
+      pinentryFlavor = if !wsl then "qt" else null;
       sshKeys = [
        "87AF23A921179C8FF040FE3359B201DC3EF61234"
       ];
-      extraConfig = ''
+      extraConfig = if wsl then ''
         pinentry-program /mnt/c/Program Files (x86)/Gpg4win/bin/pinentry.exe
-      '';
+      '' else "";
     };
+    programs.ssh.userKnownHostsFile = "${config.xdg.dataHome}/ssh/known_hosts";
   };
 }

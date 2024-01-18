@@ -27,6 +27,24 @@
   home-manager.users.pietro = let
     inherit (config.services) emacs;
   in {config, pkgs, ...}: {
+    gtk = {
+      enable = true;
+      font = {
+        package = pkgs.iosevka;
+        name = "Iosevka Regular";
+      };
+      iconTheme = {
+        package = pkgs.papirus-icon-theme;
+        name = "Papirus";
+      };
+    };
+
+    qt = {
+      enable = true;
+      platformTheme = "kde";
+      style.name = "Breeze-Dark";
+    };
+
     editorconfig = {
       enable = true;
       settings = {
@@ -56,7 +74,6 @@
       stateVersion = "24.05";
       sessionVariables = {
         EMAIL = "pietropiucco@gmail.com";
-        STACK_XDG = "1";
       };
     };
 

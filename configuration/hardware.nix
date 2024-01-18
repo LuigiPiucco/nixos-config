@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, wsl, ... }:
 
 {
   services.udev = {
@@ -140,5 +140,18 @@
 
       LABEL="probe_rs_rules_end"
     '';
+  };
+
+  hardware.opengl = {
+    enable = true;
+    driSupport = true;
+    driSupport32Bit = true;
+    extraPackages = with pkgs; [ intel-media-driver intel-ocl ];
+    extraPackages32 = with pkgs; [ intel-media-driver ];
+  };
+  hardware.nvidia.prime = {
+    # offload.enable = !wsl;
+    # nvidiaBusId = "";
+    # intelBusId = "";
   };
 }

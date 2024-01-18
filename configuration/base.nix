@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, wsl, ... }:
 
 {
   boot.tmp.cleanOnBoot = true;
@@ -6,10 +6,13 @@
   services.dbus.apparmor = "enabled";
   security.apparmor.enable = true;
   security.polkit.enable = true;
+  security.rtkit.enable = true;
   security.sudo.wheelNeedsPassword = true;
 
   environment = {
     systemPackages = with pkgs; [
+      sbctl
+      zstd
       binutils
       coreutils
       curl
@@ -64,12 +67,13 @@
   programs.ssh.enableAskPassword = false;
   programs.fish.enable = true;
 
+  nixpkgs.config.allowUnfree = true;
+
   i18n = {
     supportedLocales = [
       "en_US.UTF-8/UTF-8"
       "pt_BR.UTF-8/UTF-8"
       "ja_JP.UTF-8/UTF-8"
-      "ja_JP.EUC-JP/EUC-JP"
     ];
     defaultLocale = "en_US.UTF-8";
   };
@@ -81,6 +85,19 @@
 
   time = {
     timeZone = "America/Sao_Paulo";
-    hardwareClockInLocalTime = true;
+    hardwareClockInLocalTime = false;
   };
+
+  boot.initrd.enable = false;
+} // lib.optionalAttrs (!wsl) {
+  boot.loader.canTouchEfiVars = true;
+  hardware.enableAllFirmware = true;
+
+  boot.loader.systemd-boot.editor = false;
+  boot.lanzaboote = {
+    enable = true;
+    pkiBundle = "/etc/secureboot";
+  };
+
+  services.fwupd.enable = true;
 }

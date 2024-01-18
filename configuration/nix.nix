@@ -5,6 +5,7 @@
   nix.daemonCPUSchedPolicy = "other";
   nix.settings = {
     allowed-users = ["@users"];
+    extra-allowed-uris = ["file:/"];
     auto-optimise-store = true;
     cores = 8;
     extra-experimental-features = [
