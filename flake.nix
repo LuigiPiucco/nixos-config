@@ -26,8 +26,13 @@
   outputs = inputs: let
     inherit (inputs.nixpkgs.lib) nixosSystem;
     config = import ./configuration;
+    pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
   in {
     inherit inputs;
+    devShells.x86_64-linux.default = pkgs.mkShell {
+      name = "linuxg-luigi";
+      nativeBuildInputs = with pkgs; [nil alejandra sbcl sbclPackages.slynk];
+    };
     nixosConfigurations = {
       wslg-pietro = nixosSystem {
         modules = [config];

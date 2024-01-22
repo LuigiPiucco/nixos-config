@@ -3,14 +3,19 @@
 {
   boot.tmp.cleanOnBoot = true;
 
+  security.lockKernelModules = true;
   services.dbus.apparmor = "enabled";
-  security.apparmor.enable = true;
+  security.apparmor = {
+    enable = true;
+    killUnconfinedConfinables = true;
+  };
   security.polkit.enable = true;
   security.rtkit.enable = true;
   security.sudo.wheelNeedsPassword = true;
 
   environment = {
     systemPackages = with pkgs; [
+      pciutils
       sbctl
       zstd
       binutils
@@ -25,6 +30,7 @@
       procs
       usbutils
       nix-direnv
+      ntfs3g
       starship
       direnv
       fd
@@ -80,17 +86,17 @@
 
   console = {
     font = "Lat2-Terminus16";
-    keyMap = "us-acentos";
+    useXkbConfig = true;
   };
 
   time = {
     timeZone = "America/Sao_Paulo";
-    hardwareClockInLocalTime = false;
+    hardwareClockInLocalTime = true;
   };
 
   boot.initrd.enable = false;
 } // lib.optionalAttrs (!wsl) {
-  boot.loader.canTouchEfiVars = true;
+  boot.loader.efi.canTouchEfiVariables = true;
   hardware.enableAllFirmware = true;
 
   boot.loader.systemd-boot.editor = false;
@@ -100,4 +106,5 @@
   };
 
   services.fwupd.enable = true;
+  services.udisks2.enable = true;
 }

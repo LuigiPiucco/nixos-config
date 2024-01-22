@@ -17,7 +17,7 @@
         chain input {
           type filter hook input priority 0;
 
-          iffname lo accept;
+          iifname lo accept;
 
           ct state {established, related} accept
 
@@ -40,15 +40,12 @@
     };
   };
 
-  hardware.bluetooth = {
-    enable = !wsl;
-    hsphfpd.enable = !wsl;
-  };
+  hardware.bluetooth.enable = !wsl;
 
-  networking.wireless.enable = !wsl;
-  networking.wireless.iwd = {
-    enable = !wsl;
-  };
+  users.users.tcpcryptd.group = "tcpcryptd";
+  users.groups.tcpcryptd = {};
+
+  networking.wireless.iwd.enable = !wsl;
   networking.networkmanager = {
     enable = !wsl;
     dns = "systemd-resolved";

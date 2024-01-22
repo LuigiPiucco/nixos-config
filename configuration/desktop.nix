@@ -1,11 +1,28 @@
-{ lib, config, pkgs, inputs, utils, wsl, ... }:
+{ lib, config, pkgs, inputs, wsl, ... }:
 {
   qt.enable = true;
   programs.dconf.enable = true;
+  programs.nm-applet.enable = true;
+
+  i18n.inputMethod = {
+    enabled = "fcitx5";
+    fcitx5 = {
+      addons = with pkgs; [
+        fcitx5-lua
+        fcitx5-gtk
+        fcitx5-mozc
+        fcitx5-m17n
+        fcitx5-material-color
+        libsForQt5.fcitx5-qt
+      ];
+      waylandFrontend = true;
+    };
+  };
 
   environment = {
     systemPackages = with pkgs; [
       config.services.emacs.package
+      fcitx5-configtool
       epdfview
       egl-wayland
       freetype
@@ -17,6 +34,11 @@
       keepassxc
       polkit-kde-agent
       alacritty
+      firefox
+      libsForQt5.dolphin-plugins
+      nyxt
+      steam
+      steam-run-native
     ];
 
     variables = {
@@ -51,12 +73,15 @@
         emacsql
         vterm
         pdf-tools
+        slime
+        slime-repl-ansi-color
       ]
     );
   };
 
   fonts = {
     enableDefaultPackages = true;
+    enableGhostscriptFonts = true;
 
     fontconfig.enable = true;
     fontconfig.allowBitmaps = true;
@@ -97,7 +122,7 @@
     enable = true;
     autorun = !wsl;
     updateDbusEnvironment = true;
-    excludePackages = with pkgs; [xterm];
+    excludePackages = with pkgs; [xterm libsForQt5.plasma-nm];
 
     desktopManager = {
       runXdgAutostartIfNone = true;
@@ -107,6 +132,9 @@
         useQtScaling = true;
       };
     };
+
+    xkb.layout = "us,br";
+    xkb.variant = "intl,abnt2";
 
     displayManager.sddm = {
       enable = !wsl;

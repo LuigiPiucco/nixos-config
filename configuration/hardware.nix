@@ -150,8 +150,11 @@
     extraPackages32 = with pkgs; [ intel-media-driver ];
   };
   hardware.nvidia.prime = {
-    # offload.enable = !wsl;
-    # nvidiaBusId = "";
-    # intelBusId = "";
+    offload = {
+      enable = !wsl;
+      enableOffloadCmd = !wsl;
+    };
+    nvidiaBusId = "PCI:1:0:0";
+    intelBusId = "PCI:0:2:0";
   };
 }

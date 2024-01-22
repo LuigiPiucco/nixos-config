@@ -22,27 +22,7 @@
     shell = pkgs.fish;
   };
 
-  home-manager.users.luigi = let
-    inherit (config.services) emacs;
-  in {config, osConfig, pkgs, ...}: {
-    gtk = {
-      enable = true;
-      font = {
-        package = pkgs.iosevka;
-        name = "Iosevka Regular";
-      };
-      iconTheme = {
-        package = pkgs.papirus-icon-theme;
-        name = "Papirus";
-      };
-    };
-
-    qt = {
-      enable = true;
-      platformTheme = "kde";
-      style.name = "Breeze-Dark";
-    };
-
+  home-manager.users.luigi = {config, osConfig, pkgs, ...}: {
     editorconfig = {
       enable = true;
       settings = {
@@ -63,13 +43,6 @@
 
     home = {
       enableNixpkgsReleaseCheck = true;
-      pointerCursor = {
-        package = pkgs.libsForQt5.breeze-gtk;
-        name = "Breeze_cursors";
-        size = 24;
-
-        gtk.enable = true;
-      };
       stateVersion = "24.05";
       sessionVariables = {
         EMAIL = "luigipiucco@gmail.com";
@@ -93,39 +66,40 @@
     programs.fish = {
       enable = true;
       interactiveShellInit = ''
-        function vterm_printf
-            printf "\e]%s\e\\" "$1"
-        end
-
         if [ "$INSIDE_EMACS" = 'vterm' ]
+          function vterm_printf
+              printf "\e]%s\e\\" "$1"
+          end
+
           function clear
             vterm_printf "51;Evterm-clear-scrollback";
             tput clear;
           end
-        end
 
-        function fish_title
-          hostname
-          echo ":"
-          prompt_pwd
-        end
-
-        function vterm_cmd --description 'Run an Emacs command among the ones been defined in vterm-eval-cmds.'
-          set -l vterm_elisp ()
-          for arg in $argv
-            set -a vterm_elisp (printf '"%s" ' (string replace -a -r '([\\\\"])' '\\\\\\\\$1' $arg))
+          function fish_title
+            hostname
+            echo ":"
+            prompt_pwd
           end
-          vterm_printf '51;E'(string join "" $vterm_elisp)
+
+          function vterm_cmd --description 'Run an Emacs command among the ones been defined in vterm-eval-cmds.'
+            set -l vterm_elisp ()
+            for arg in $argv
+              set -a vterm_elisp (printf '"%s" ' (string replace -a -r '([\\\\"])' '\\\\\\\\$1' $arg))
+            end
+            vterm_printf '51;E'(string join "" $vterm_elisp)
+          end
+
+          function vterm_prompt_end;
+            vterm_printf '51;A'(whoami)'@'(hostname)':'(pwd)
+          end
+          functions --copy fish_prompt vterm_old_fish_prompt
+          function fish_prompt --description 'Write out the prompt; do not replace this; Instead, put this at end of your file.'
+            printf "%b" (vterm_old_fish_prompt)
+            vterm_prompt_end
+          end
         end
 
-        function vterm_prompt_end;
-          vterm_printf '51;A'(whoami)'@'(hostname)':'(pwd)
-        end
-        functions --copy fish_prompt vterm_old_fish_prompt
-        function fish_prompt --description 'Write out the prompt; do not replace this; Instead, put this at end of your file.'
-          printf "%b" (vterm_old_fish_prompt)
-          vterm_prompt_end
-        end
       '';
     };
     programs.less.enable = true;
@@ -190,7 +164,11 @@
       nix:
         enable: true
     '';
-
+    xdg.dataFile."dbus-1/services/org.freedesktop.secrets.service".text = ''
+      [D-BUS Service]
+      Name=org.freedesktop.secrets
+      Exec=${pkgs.keepassxc}/bin/keepassxc
+    '';
     nix = {
       enable = true;
       inherit (osConfig.nix) settings;

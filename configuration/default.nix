@@ -3,7 +3,7 @@
   imports = [
     inputs.home.nixosModules.default
     inputs.nixos-wsl.nixosModules.default
-    inputs.lanzaboote.nixosModules.default
+    inputs.lanzaboote.nixosModules.lanzaboote
     ./base.nix
     ./hardware.nix
     ./network.nix
