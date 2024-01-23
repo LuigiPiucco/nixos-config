@@ -7,8 +7,3 @@ style = "cyan"
 before_repo_root_style = "grey"
 repo_root_style = "bold cyan"
 truncation_symbol = "(etc.)/"
-
-[direnv]
-disabled = true
-detect_files = [".envrc", ".env"]
-detect_folders = [".direnv"]
