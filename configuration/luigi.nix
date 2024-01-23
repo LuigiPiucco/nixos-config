@@ -68,7 +68,7 @@
       interactiveShellInit = ''
         if [ "$INSIDE_EMACS" = 'vterm' ]
           function vterm_printf
-              printf "\e]%s\e\\" "$1"
+              printf "\e]%s\e\\" "$argv"
           end
 
           function clear
@@ -99,7 +99,6 @@
             vterm_prompt_end
           end
         end
-
       '';
     };
     programs.less.enable = true;
