@@ -116,6 +116,8 @@
         unicode-character-database
         ucs-fonts
         unifont
+        liberation_ttf
+        helvetica-neue-lt-std
       ];
   };
 
