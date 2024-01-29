@@ -54,7 +54,6 @@
 
     sessionVariables = {
       PAGER = "less";
-      STARSHIP_CONFIG = ../data/starship.toml;
     };
 
     shellAliases = {

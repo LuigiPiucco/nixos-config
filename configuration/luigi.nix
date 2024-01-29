@@ -57,47 +57,41 @@
       icons = true;
     };
 
-    programs.direnv = {
-      enable = true;
-      nix-direnv.enable = true;
-    };
-
     programs.bat.enable = true;
     programs.fish = {
       enable = true;
       interactiveShellInit = ''
-        if [ "$INSIDE_EMACS" = 'vterm' ]
-          function vterm_printf
-              printf "\e]%s\e\\" "$argv"
-          end
+        function vterm_printf
+            printf "\e]%s\e\\" "$argv"
+        end
 
+        if [ "$INSIDE_EMACS" = 'vterm' ]
           function clear
             vterm_printf "51;Evterm-clear-scrollback";
             tput clear;
           end
-
           function fish_title
             hostname
             echo ":"
             prompt_pwd
           end
+        end
 
-          function vterm_cmd --description 'Run an Emacs command among the ones been defined in vterm-eval-cmds.'
-            set -l vterm_elisp ()
-            for arg in $argv
-              set -a vterm_elisp (printf '"%s" ' (string replace -a -r '([\\\\"])' '\\\\\\\\$1' $arg))
-            end
-            vterm_printf '51;E'(string join "" $vterm_elisp)
+        function vterm_cmd --description 'Run an Emacs command among the ones been defined in vterm-eval-cmds.'
+          set -l vterm_elisp ()
+          for arg in $argv
+            set -a vterm_elisp (printf '"%s" ' (string replace -a -r '([\\\\"])' '\\\\\\\\$1' $arg))
           end
+          vterm_printf '51;E'(string join "" $vterm_elisp)
+        end
 
-          function vterm_prompt_end;
-            vterm_printf '51;A'(whoami)'@'(hostname)':'(pwd)
-          end
-          functions --copy fish_prompt vterm_old_fish_prompt
-          function fish_prompt --description 'Write out the prompt; do not replace this; Instead, put this at end of your file.'
-            printf "%b" (vterm_old_fish_prompt)
-            vterm_prompt_end
-          end
+        function vterm_prompt_end;
+          vterm_printf '51;A'(whoami)'@'(hostname)':'(pwd)
+        end
+        functions --copy fish_prompt vterm_old_fish_prompt
+        function fish_prompt --description 'Write out the prompt; do not replace this; Instead, put this at end of your file.'
+          vterm_old_fish_prompt
+          vterm_prompt_end
         end
       '';
     };
@@ -118,7 +112,7 @@
           truncation_symbol = "(etc.)/";
         };
         direnv = {
-          disabled = false;
+          disabled = true;
           detect_files = [".envrc" ".env"];
           detect_folders = [".direnv"];
         };
