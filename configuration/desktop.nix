@@ -78,6 +78,7 @@
         pdf-tools
         slime
         slime-repl-ansi-color
+        treesit-grammars.with-all-grammars
       ]
     );
   };
