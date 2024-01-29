@@ -39,6 +39,9 @@
       nyxt
       steam
       steam-run-native
+      typst
+      typstfmt
+      typst-lsp
     ];
 
     variables = {
