@@ -31,7 +31,7 @@
     inherit inputs;
     devShells.x86_64-linux.default = pkgs.mkShell {
       name = "linuxg-luigi";
-      nativeBuildInputs = with pkgs; [nil alejandra sbcl sbclPackages.slynk];
+      nativeBuildInputs = with pkgs; [nil alejandra sbcl taplo];
     };
     nixosConfigurations = {
       wslg-pietro = nixosSystem {
