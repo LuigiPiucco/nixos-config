@@ -1,9 +1,11 @@
 { config, lib, pkgs, wsl, ... }:
 
 {
+  hardware.keyboard.qmk.enable = true;
+
   services.udev = {
     enable = true;
-    packages = with pkgs; [libftdi1];
+    packages = with pkgs; [libftdi1 qmk-udev-rules android-udev-rules];
     extraRules = ''
       # Copy this file to /etc/udev/rules.d/
       # If rules fail to reload automatically, you can refresh udev rules
@@ -142,7 +144,12 @@
     '';
   };
 
+  hardware.uinput.enable = true;
   hardware.steam-hardware.enable = true;
+
+  programs.udevil.enable = !wsl;
+
+  hardware.usb-modeswitch.enable = true;
   hardware.opengl = {
     enable = true;
     driSupport = true;

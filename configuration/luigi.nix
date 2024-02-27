@@ -16,6 +16,8 @@
       "plugdev"
       "uucp"
       "dialout"
+      "uinput"
+      "adbusers"
     ];
     uid = 1000;
     group = "users";

@@ -48,6 +48,9 @@
       ClassicBondedOnly = false;
     };
   };
+  environment.systemPackages = with pkgs; [
+    obexfs
+  ];
 
   users.users.tcpcryptd.group = "tcpcryptd";
   users.groups.tcpcryptd = {};

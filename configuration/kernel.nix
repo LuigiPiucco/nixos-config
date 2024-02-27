@@ -29,6 +29,8 @@
       "usbcore"
       "ch9344"
       "usbip"
+      "apfs"
+      "hid-ite8291r3"
       "hid-playstation"
     ];
   };
