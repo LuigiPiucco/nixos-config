@@ -111,4 +111,9 @@
 
   services.fwupd.enable = true;
   services.udisks2.enable = true;
+  services.syncthing = {
+    enable = true;
+    overrideDevices = false;
+    overrideFolders = false;
+  };
 }
