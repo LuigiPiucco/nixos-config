@@ -25,6 +25,8 @@
     systemPackages = with pkgs; [
       config.services.emacs.package
       lutris
+      arduino
+      arduino-cli
       protonup-qt
       partition-manager
       fcitx5-configtool
