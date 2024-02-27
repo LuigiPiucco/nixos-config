@@ -46,10 +46,12 @@
     home = {
       enableNixpkgsReleaseCheck = true;
       stateVersion = "24.05";
-      sessionVariables = {
-        EMAIL = "luigipiucco@gmail.com";
-        STACK_XDG = "1";
-      };
+    };
+    systemd.user.sessionVariables = {
+      EMAIL = "luigipiucco@gmail.com";
+      STACK_XDG = "1";
+      JULIA_DEPOT_PATH = "${config.xdg.dataHome}/julia:";
+      JULIAUP_DEPOT_PATH = "${config.xdg.dataHome}/julia";
     };
 
     programs.eza = {
