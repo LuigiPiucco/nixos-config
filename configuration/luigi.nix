@@ -111,7 +111,7 @@
         };
         directory = {
           style = "cyan";
-          before_repo_root_style = "black";
+          before_repo_root_style = "light grey";
           repo_root_style = "bold cyan";
           truncation_symbol = "(etc.)/";
         };
