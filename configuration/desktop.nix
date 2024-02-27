@@ -19,9 +19,13 @@
     };
   };
 
+  programs.steam.enable = true;
+
   environment = {
     systemPackages = with pkgs; [
       config.services.emacs.package
+      lutris
+      protonup-qt
       fcitx5-configtool
       epdfview
       egl-wayland
@@ -38,10 +42,11 @@
       libsForQt5.dolphin-plugins
       nyxt
       steam
-      steam-run-native
+      steam-run
       typst
       typstfmt
       typst-lsp
+      discord
     ];
 
     variables = {
@@ -147,7 +152,7 @@
       wayland.enable = true;
     };
   } // lib.optionalAttrs (!wsl) {
-    videoDrivers = ["nvidia" "modesetting"];
+    videoDrivers = ["nvidia"];
 
     libinput = {
       touchpad = {

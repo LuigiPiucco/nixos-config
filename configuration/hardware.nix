@@ -142,13 +142,15 @@
     '';
   };
 
+  hardware.steam-hardware.enable = true;
   hardware.opengl = {
     enable = true;
     driSupport = true;
     driSupport32Bit = true;
-    extraPackages = with pkgs; [ intel-media-driver intel-ocl ];
+    extraPackages = with pkgs; [ intel-media-driver intel-ocl egl-wayland eglexternalplatform ];
     extraPackages32 = with pkgs; [ intel-media-driver ];
   };
+  hardware.nvidia.modesetting.enable = true;
   hardware.nvidia.prime = {
     offload = {
       enable = !wsl;
@@ -157,4 +159,8 @@
     nvidiaBusId = "PCI:1:0:0";
     intelBusId = "PCI:0:2:0";
   };
+
+  environment.systemPackages = with pkgs; [
+    hidapi
+  ];
 }

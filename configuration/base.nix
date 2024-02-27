@@ -50,6 +50,10 @@
       p7zip
       xdg-dbus-proxy
       libsecret
+      wineWow64Packages.unstableFull
+      dxvk
+      vkd3d
+      vkd3d-proton
     ];
 
     sessionVariables = {

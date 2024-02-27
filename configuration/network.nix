@@ -40,7 +40,14 @@
     };
   };
 
-  hardware.bluetooth.enable = !wsl;
+  hardware.bluetooth = {
+    enable = !wsl;
+    package = pkgs.bluez5;
+    input.General = {
+      UserspaceHID = true;
+      ClassicBondedOnly = false;
+    };
+  };
 
   users.users.tcpcryptd.group = "tcpcryptd";
   users.groups.tcpcryptd = {};

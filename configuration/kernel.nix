@@ -23,7 +23,14 @@
       };
     in
       if wsl then pkgs.linuxPackagesFor wsl-kernel else pkgs.linuxKernel.packages.linux_zen;
-    kernelModules = ["ftdi_sio" "usbserial" "usbcore" "ch9344" "usbip"];
+    kernelModules = [
+      "ftdi_sio"
+      "usbserial"
+      "usbcore"
+      "ch9344"
+      "usbip"
+      "hid-playstation"
+    ];
   };
   environment.systemPackages = lib.optional wsl config.boot.kernelPackages.usbip;
 }
