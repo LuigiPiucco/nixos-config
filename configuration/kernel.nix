@@ -32,6 +32,7 @@
       "apfs"
       "hid-ite8291r3"
       "hid-playstation"
+      "pkcs8_key_parser"
     ];
   };
   environment.systemPackages = lib.optional wsl config.boot.kernelPackages.usbip;

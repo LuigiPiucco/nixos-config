@@ -19,8 +19,6 @@
     keep-outputs = false;
     max-jobs = 8;
     print-missing = true;
-    pure-eval = true;
-    restrict-eval = true;
     sandbox = true;
     trusted-users = ["root" "@wheel"];
     use-xdg-base-directories = true;

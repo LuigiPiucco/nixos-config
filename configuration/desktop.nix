@@ -26,6 +26,7 @@
       config.services.emacs.package
       lutris
       protonup-qt
+      partition-manager
       fcitx5-configtool
       epdfview
       egl-wayland
@@ -46,6 +47,8 @@
       typst
       typstfmt
       typst-lsp
+      libreoffice-qt
+      vlc
       discord
     ];
 
@@ -81,8 +84,6 @@
         emacsql
         vterm
         pdf-tools
-        slime
-        slime-repl-ansi-color
         treesit-grammars.with-all-grammars
       ]
     );

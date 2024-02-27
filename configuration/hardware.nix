@@ -144,6 +144,7 @@
     '';
   };
 
+  hardware.ksm.enable = true;
   hardware.uinput.enable = true;
   hardware.steam-hardware.enable = true;
 
