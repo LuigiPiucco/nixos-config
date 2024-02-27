@@ -74,7 +74,6 @@
   programs.nix-ld.enable = true;
   programs.command-not-found.enable = false;
   programs.ssh.enableAskPassword = false;
-  programs.fish.enable = true;
 
   nixpkgs.config.allowUnfree = true;
 
