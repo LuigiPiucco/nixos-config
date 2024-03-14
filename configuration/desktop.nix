@@ -1,5 +1,4 @@
 { lib, config, pkgs, inputs, wsl, ... }: {
-  qt.enable = true;
   programs.dconf.enable = true;
   programs.nm-applet.enable = true;
 
@@ -15,6 +14,7 @@
         libsForQt5.fcitx5-qt
       ];
       waylandFrontend = true;
+      plasma6Support = true;
     };
   };
 
@@ -60,7 +60,6 @@
       VISUAL = "emacsclient -a 'emacs'";
       QT_AUTO_SCREEN_SCALE_FACTOR = "1";
       QT_QPA_PLATFORM = "wayland;xcb";
-      QT_QPA_PLATFORMTHEME = "gtk";
       GDK_BACKEND = "wayland,xcb";
       CLUTTER_BACKEND = "wayland";
       GTK_USE_PORTAL = "1";
@@ -417,19 +416,21 @@
 
   gtk.iconCache.enable = true;
 
+  qt = {
+    enable = true;
+    platformTheme = "kde";
+    style = "breeze";
+  };
+  services.desktopManager.plasma6.enable = !wsl;
   services.xserver = {
     enable = true;
     autorun = !wsl;
     updateDbusEnvironment = true;
-    excludePackages = with pkgs; [ xterm libsForQt5.plasma-nm ];
+    excludePackages = with pkgs; [ xterm ];
 
     desktopManager = {
       runXdgAutostartIfNone = true;
       gnome.enable = false;
-      plasma5 = {
-        enable = true;
-        useQtScaling = true;
-      };
     };
 
     xkb.layout = "us,br";
