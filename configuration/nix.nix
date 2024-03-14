@@ -4,8 +4,8 @@
   nix.daemonIOSchedPriority = 2;
   nix.daemonCPUSchedPolicy = "other";
   nix.settings = {
-    allowed-users = ["@users"];
-    extra-allowed-uris = ["file:/"];
+    allowed-users = [ "@users" ];
+    extra-allowed-uris = [ "file:/" ];
     auto-optimise-store = true;
     cores = 8;
     extra-experimental-features = [
@@ -20,7 +20,7 @@
     max-jobs = 8;
     print-missing = true;
     sandbox = true;
-    trusted-users = ["root" "@wheel"];
+    trusted-users = [ "root" "@wheel" ];
     use-xdg-base-directories = true;
   };
   nix.gc = {
@@ -31,6 +31,6 @@
   };
   nix.optimise = {
     automatic = true;
-    dates = ["daily"];
+    dates = [ "daily" ];
   };
 }

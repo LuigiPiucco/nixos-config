@@ -1,8 +1,6 @@
-{ config, pkgs, inputs, ... }:
-
-{
-  users.extraGroups.adbusers = {};
-  users.extraGroups.plugdev = {};
+{ pkgs, ... }: {
+  users.extraGroups.adbusers = { };
+  users.extraGroups.plugdev = { };
   users.defaultUserShell = pkgs.fish;
   programs.fish.enable = true;
 

@@ -1,9 +1,9 @@
-{ config, lib, pkgs, wsl, mainUser, ... }:
-
-{
-  users.users.root.hashedPassword = "$6$AuFJcsrir3QGAuqD$XavJkb/EsihqfAZLX86USxjX/i9mxRNiDi.e36vNSwKIsSjY9XbyBrVwwgR37X2uSrbpeWSbmBvOcnv2podCM/";
+{ pkgs, wsl, ... }: {
+  users.users.root.hashedPassword =
+    "$6$AuFJcsrir3QGAuqD$XavJkb/EsihqfAZLX86USxjX/i9mxRNiDi.e36vNSwKIsSjY9XbyBrVwwgR37X2uSrbpeWSbmBvOcnv2podCM/";
   users.users.luigi = {
-    hashedPassword = "$6$AuFJcsrir3QGAuqD$XavJkb/EsihqfAZLX86USxjX/i9mxRNiDi.e36vNSwKIsSjY9XbyBrVwwgR37X2uSrbpeWSbmBvOcnv2podCM/";
+    hashedPassword =
+      "$6$AuFJcsrir3QGAuqD$XavJkb/EsihqfAZLX86USxjX/i9mxRNiDi.e36vNSwKIsSjY9XbyBrVwwgR37X2uSrbpeWSbmBvOcnv2podCM/";
     description = "Luigi Sartor Piucco";
     isNormalUser = true;
     extraGroups = [
@@ -24,7 +24,7 @@
     shell = pkgs.fish;
   };
 
-  home-manager.users.luigi = {config, osConfig, pkgs, ...}: {
+  home-manager.users.luigi = { config, osConfig, pkgs, ... }: {
     editorconfig = {
       enable = true;
       settings = {
@@ -117,8 +117,8 @@
         };
         direnv = {
           disabled = true;
-          detect_files = [".envrc" ".env"];
-          detect_folders = [".direnv"];
+          detect_files = [ ".envrc" ".env" ];
+          detect_folders = [ ".direnv" ];
         };
       };
     };
@@ -126,12 +126,7 @@
     programs.git = {
       enable = true;
 
-      ignores = [
-        ".direnv/"
-        ".cache/"
-        "*~"
-        "*.bak"
-      ];
+      ignores = [ ".direnv/" ".cache/" "*~" "*.bak" ];
 
       lfs.enable = true;
 
@@ -181,12 +176,11 @@
       enableSshSupport = true;
       enableFishIntegration = true;
       pinentryFlavor = if !wsl then "qt" else null;
-      sshKeys = [
-       "87AF23A921179C8FF040FE3359B201DC3EF61234"
-      ];
+      sshKeys = [ "87AF23A921179C8FF040FE3359B201DC3EF61234" ];
       extraConfig = if wsl then ''
         pinentry-program /mnt/c/Program Files (x86)/Gpg4win/bin/pinentry.exe
-      '' else "";
+      '' else
+        "";
     };
     programs.ssh.userKnownHostsFile = "${config.xdg.dataHome}/ssh/known_hosts";
   };

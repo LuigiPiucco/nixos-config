@@ -1,11 +1,11 @@
-{ config, lib, pkgs, ... }:
-
-{
+{ config, pkgs, ... }: {
   wsl.defaultUser = "pietro";
 
-  users.users.root.hashedPassword = "$6$8tFm9JADE9l04cQq$M.iDOvqlNWup.h2XSBlWdgF5RDy/T4wJ0HmzNoMSz8mCYoxqjxdbTmYWZRAEqJtoTyu9NJpQ0XHqiQS.GL.y5/";
+  users.users.root.hashedPassword =
+    "$6$8tFm9JADE9l04cQq$M.iDOvqlNWup.h2XSBlWdgF5RDy/T4wJ0HmzNoMSz8mCYoxqjxdbTmYWZRAEqJtoTyu9NJpQ0XHqiQS.GL.y5/";
   users.users.luigi = {
-    hashedPassword = "$6$8tFm9JADE9l04cQq$M.iDOvqlNWup.h2XSBlWdgF5RDy/T4wJ0HmzNoMSz8mCYoxqjxdbTmYWZRAEqJtoTyu9NJpQ0XHqiQS.GL.y5/";
+    hashedPassword =
+      "$6$8tFm9JADE9l04cQq$M.iDOvqlNWup.h2XSBlWdgF5RDy/T4wJ0HmzNoMSz8mCYoxqjxdbTmYWZRAEqJtoTyu9NJpQ0XHqiQS.GL.y5/";
     description = "Pietro Sartor Piucco";
     isNormalUser = true;
     extraGroups = [
@@ -24,9 +24,8 @@
     shell = pkgs.fish;
   };
 
-  home-manager.users.pietro = let
-    inherit (config.services) emacs;
-  in {config, pkgs, ...}: {
+  home-manager.users.pietro = let inherit (config.services) emacs;
+  in { config, pkgs, ... }: {
     gtk = {
       enable = true;
       font = {
@@ -72,9 +71,7 @@
         gtk.enable = true;
       };
       stateVersion = "24.05";
-      sessionVariables = {
-        EMAIL = "pietropiucco@gmail.com";
-      };
+      sessionVariables = { EMAIL = "pietropiucco@gmail.com"; };
     };
 
     programs.eza = {

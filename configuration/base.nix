@@ -1,5 +1,4 @@
 { config, lib, pkgs, wsl, ... }:
-
 {
   boot.tmp.cleanOnBoot = true;
 
@@ -56,9 +55,7 @@
       vkd3d-proton
     ];
 
-    sessionVariables = {
-      PAGER = "less";
-    };
+    sessionVariables = { PAGER = "less"; };
 
     shellAliases = {
       top = "btm";
@@ -78,11 +75,8 @@
   nixpkgs.config.allowUnfree = true;
 
   i18n = {
-    supportedLocales = [
-      "en_US.UTF-8/UTF-8"
-      "pt_BR.UTF-8/UTF-8"
-      "ja_JP.UTF-8/UTF-8"
-    ];
+    supportedLocales =
+      [ "en_US.UTF-8/UTF-8" "pt_BR.UTF-8/UTF-8" "ja_JP.UTF-8/UTF-8" ];
     defaultLocale = "en_US.UTF-8";
   };
 

@@ -1,11 +1,9 @@
-{ config, lib, pkgs, wsl, ... }:
-
-{
+{ pkgs, wsl, ... }: {
   hardware.keyboard.qmk.enable = true;
 
   services.udev = {
     enable = true;
-    packages = with pkgs; [libftdi1 qmk-udev-rules android-udev-rules];
+    packages = with pkgs; [ libftdi1 qmk-udev-rules android-udev-rules ];
     extraRules = ''
       # Copy this file to /etc/udev/rules.d/
       # If rules fail to reload automatically, you can refresh udev rules
@@ -155,7 +153,12 @@
     enable = true;
     driSupport = true;
     driSupport32Bit = true;
-    extraPackages = with pkgs; [ intel-media-driver intel-ocl egl-wayland eglexternalplatform ];
+    extraPackages = with pkgs; [
+      intel-media-driver
+      intel-ocl
+      egl-wayland
+      eglexternalplatform
+    ];
     extraPackages32 = with pkgs; [ intel-media-driver ];
   };
   hardware.nvidia.modesetting.enable = true;
@@ -168,7 +171,5 @@
     intelBusId = "PCI:0:2:0";
   };
 
-  environment.systemPackages = with pkgs; [
-    hidapi
-  ];
+  environment.systemPackages = with pkgs; [ hidapi ];
 }

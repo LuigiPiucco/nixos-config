@@ -1,9 +1,7 @@
-{ config, lib, pkgs, wsl, ... }:
-
-{
+{ pkgs, wsl, ... }: {
   networking.enableIPv6 = true;
   networking.firewall.enable = !wsl;
-  networking.nameservers = ["1.1.1.1" "1.0.0.1"];
+  networking.nameservers = [ "1.1.1.1" "1.0.0.1" ];
   networking.useNetworkd = true;
   networking.dhcpcd.enable = false;
   networking.tcpcrypt.enable = true;
@@ -48,12 +46,10 @@
       ClassicBondedOnly = false;
     };
   };
-  environment.systemPackages = with pkgs; [
-    obexfs
-  ];
+  environment.systemPackages = with pkgs; [ obexfs ];
 
   users.users.tcpcryptd.group = "tcpcryptd";
-  users.groups.tcpcryptd = {};
+  users.groups.tcpcryptd = { };
 
   networking.wireless.iwd.enable = !wsl;
   networking.networkmanager = {

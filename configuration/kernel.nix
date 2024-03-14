@@ -1,5 +1,4 @@
-{ lib, config, pkgs, inputs, wsl, ... }:
-{
+{ lib, config, pkgs, inputs, wsl, ... }: {
   boot = {
     kernelPackages = let
       msconfig = pkgs.writeTextFile {
@@ -19,10 +18,12 @@
         configfile = msconfig;
         extraMeta.branch = "linux-msft-wsl-6.1.y";
         src = inputs.microsoft-kernel;
-        kernelPatches = [];
+        kernelPatches = [ ];
       };
-    in
-      if wsl then pkgs.linuxPackagesFor wsl-kernel else pkgs.linuxKernel.packages.linux_zen;
+    in if wsl then
+      pkgs.linuxPackagesFor wsl-kernel
+    else
+      pkgs.linuxKernel.packages.linux_zen;
     kernelModules = [
       "kvm-intel"
       "btusb"
@@ -52,5 +53,6 @@
       kernelModules = [ ];
     };
   };
-  environment.systemPackages = lib.optional wsl config.boot.kernelPackages.usbip;
+  environment.systemPackages =
+    lib.optional wsl config.boot.kernelPackages.usbip;
 }

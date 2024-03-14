@@ -1,5 +1,4 @@
-{ config, lib, pkgs, inputs, wsl, mainUser, ... }:
-{
+{ lib, inputs, wsl, mainUser, ... }: {
   imports = [
     inputs.home.nixosModules.default
     inputs.lanzaboote.nixosModules.lanzaboote

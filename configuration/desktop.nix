@@ -1,5 +1,4 @@
-{ lib, config, pkgs, inputs, wsl, ... }:
-{
+{ lib, config, pkgs, inputs, wsl, ... }: {
   qt.enable = true;
   programs.dconf.enable = true;
   programs.nm-applet.enable = true;
@@ -68,8 +67,7 @@
     };
   };
 
-  documentation = let
-    enableAttr = { enable = true; };
+  documentation = let enableAttr = { enable = true; };
   in enableAttr // {
     dev = enableAttr;
     man = enableAttr;
@@ -89,8 +87,7 @@
         vterm
         pdf-tools
         treesit-grammars.with-all-grammars
-      ]
-    );
+      ]);
   };
 
   fonts = {
@@ -137,7 +134,7 @@
     enable = true;
     autorun = !wsl;
     updateDbusEnvironment = true;
-    excludePackages = with pkgs; [xterm libsForQt5.plasma-nm];
+    excludePackages = with pkgs; [ xterm libsForQt5.plasma-nm ];
 
     desktopManager = {
       runXdgAutostartIfNone = true;
@@ -156,7 +153,7 @@
       wayland.enable = true;
     };
   } // lib.optionalAttrs (!wsl) {
-    videoDrivers = ["nvidia"];
+    videoDrivers = [ "nvidia" ];
 
     libinput = {
       touchpad = {
@@ -169,8 +166,8 @@
 
   xdg.portal = {
     enable = true;
-    config.common.default = ["kde" "gtk"];
-    extraPortals = with pkgs; [xdg-desktop-portal-kde xdg-desktop-portal-gtk];
+    config.common.default = [ "kde" "gtk" ];
+    extraPortals = with pkgs; [ xdg-desktop-portal-kde xdg-desktop-portal-gtk ];
     xdgOpenUsePortal = true;
   };
 
