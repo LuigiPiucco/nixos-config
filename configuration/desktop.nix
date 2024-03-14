@@ -52,6 +52,8 @@
       libreoffice-qt
       vlc
       discord
+      tor-browser
+      kicad-testing
     ];
 
     variables = {
