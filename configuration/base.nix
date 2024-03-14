@@ -95,10 +95,9 @@
     timeZone = "America/Sao_Paulo";
     hardwareClockInLocalTime = true;
   };
-
-  boot.initrd.enable = false;
 } // lib.optionalAttrs (!wsl) {
   boot.loader.efi.canTouchEfiVariables = true;
+  hardware.enableRedistributableFirmware = true;
   hardware.enableAllFirmware = true;
   programs.usbtop.enable = true;
 

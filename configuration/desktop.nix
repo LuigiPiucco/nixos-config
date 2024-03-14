@@ -103,20 +103,19 @@
     fontconfig.subpixel.rgba = "rgb";
     fontconfig.subpixel.lcdfilter = "light";
     fontconfig.hinting.enable = true;
-    fontconfig.defaultFonts.monospace = ["Iosevka" "Fira Code"];
-    fontconfig.defaultFonts.serif = ["Iosevka Etoile"];
-    fontconfig.defaultFonts.sansSerif = ["Iosevka Curly"];
-    fontconfig.defaultFonts.emoji = ["Fira Code Symbol" "FiraCode Nerd Font"];
+    fontconfig.defaultFonts.monospace = [ "Iosevka" "Fira Code" ];
+    fontconfig.defaultFonts.serif = [ "Iosevka Etoile" ];
+    fontconfig.defaultFonts.sansSerif = [ "Iosevka Curly" ];
+    fontconfig.defaultFonts.emoji = [ "Fira Code Symbol" "FiraCode Nerd Font" ];
 
-    packages = with pkgs; let
-      iosevkas = map (variant: iosevka-bin.override {inherit variant;}) [
-        ""
-        "curly"
-        "etoile"
-      ];
-    in
-      iosevkas
-      ++ [
+    packages = with pkgs;
+      let
+        iosevkas = map (variant: iosevka-bin.override { inherit variant; }) [
+          ""
+          "Curly"
+          "Etoile"
+        ];
+      in iosevkas ++ [
         sarasa-gothic
         fira-code
         fira-code-symbols

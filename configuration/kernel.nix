@@ -24,6 +24,8 @@
     in
       if wsl then pkgs.linuxPackagesFor wsl-kernel else pkgs.linuxKernel.packages.linux_zen;
     kernelModules = [
+      "kvm-intel"
+      "btusb"
       "ftdi_sio"
       "usbserial"
       "usbcore"
@@ -32,8 +34,23 @@
       "apfs"
       "hid-ite8291r3"
       "hid-playstation"
-      "pkcs8_key_parser"
+      "hid-generic"
+      "pkcs8-key-parser"
     ];
+
+    initrd = {
+      enable = !wsl;
+      availableKernelModules = [
+        "xhci_pci"
+        "dwc3_pci"
+        "ahci"
+        "nvme"
+        "usbhid"
+        "sd_mod"
+        "rtsx_pci_sdmmc"
+      ];
+      kernelModules = [ ];
+    };
   };
   environment.systemPackages = lib.optional wsl config.boot.kernelPackages.usbip;
 }
