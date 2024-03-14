@@ -50,7 +50,7 @@
       p7zip
       xdg-dbus-proxy
       libsecret
-      wineWow64Packages.unstableFull
+      wineWowPackages.stagingFull
       dxvk
       vkd3d
       vkd3d-proton
