@@ -31,13 +31,13 @@
     inherit inputs;
     devShells.x86_64-linux.default = pkgs.mkShell {
       name = "linuxg-luigi";
-      nativeBuildInputs = with pkgs; [nil alejandra sbcl taplo];
     };
     nixosConfigurations = {
       wslg-pietro = nixosSystem {
         modules = [config];
         specialArgs = {inherit inputs; wsl = true; mainUser = "pietro";};
         system = "x86_64-linux";
+        buildInputs = with pkgs; [ nil nixfmt ];
       };
       wslg-luigi = nixosSystem {
         modules = [config];
