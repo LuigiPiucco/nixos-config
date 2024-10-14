@@ -6,6 +6,10 @@
   nix.settings = {
     allowed-users = [ "@users" ];
     extra-allowed-uris = [ "file:/" ];
+    extra-substituters = [ "https://nix-community.cachix.org" ];
+    extra-trusted-public-keys = [
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
     auto-optimise-store = true;
     cores = 8;
     extra-experimental-features = [
@@ -17,6 +21,7 @@
     ];
     keep-derivations = false;
     keep-outputs = false;
+    keep-failed = false;
     max-jobs = 8;
     print-missing = true;
     sandbox = true;

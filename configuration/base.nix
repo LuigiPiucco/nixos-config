@@ -1,6 +1,7 @@
-{ config, lib, pkgs, wsl, ... }:
+{ config, lib, pkgs, ... }:
 {
-  boot.tmp.cleanOnBoot = true;
+  boot.tmp.cleanOnBoot = false;
+  systemd.tmpfiles.rules = ["D! /tmp 1777 root root 0d"];
 
   security.lockKernelModules = true;
   services.dbus.apparmor = "enabled";
@@ -14,16 +15,17 @@
 
   environment = {
     systemPackages = with pkgs; [
+      pijul
       pciutils
       sbctl
       zstd
+      unrar
       binutils
       coreutils
       curl
       dnsutils
       bottom
       manix
-      whois
       bat
       eza
       procs
@@ -34,16 +36,12 @@
       direnv
       fd
       git
-      jq
       ripgrep
-      python3
-      libtool
       bat
       git-lfs
       zoxide
       man-pages
       stdmanpages
-      tio
       socat
       ltex-ls
       p7zip
@@ -68,7 +66,7 @@
     };
   };
 
-  programs.nix-ld.enable = true;
+  programs.nix-ld.dev.enable = true;
   programs.command-not-found.enable = false;
   programs.ssh.enableAskPassword = false;
 
@@ -89,7 +87,7 @@
     timeZone = "America/Sao_Paulo";
     hardwareClockInLocalTime = true;
   };
-} // lib.optionalAttrs (!wsl) {
+
   boot.loader.efi.canTouchEfiVariables = true;
   hardware.enableRedistributableFirmware = true;
   hardware.enableAllFirmware = true;

@@ -12,16 +12,11 @@
     nixpkgs.url = "github:NixOS/nixpkgs";
     home.url = "github:nix-community/home-manager";
     home.inputs.nixpkgs.follows = "nixpkgs";
-    nixos-wsl.url = "github:nix-community/NixOS-WSL";
+    nix-ld.url = "github:nix-community/nix-ld";
+    nix-ld.inputs.nixpkgs.follows = "nixpkgs";
     lanzaboote.url = "github:nix-community/lanzaboote";
     lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
-
     emacs-overlay.url = "github:nix-community/emacs-overlay";
-
-    microsoft-kernel = {
-      url = "github:microsoft/WSL2-Linux-Kernel/linux-msft-wsl-6.1.y";
-      flake = false;
-    };
   };
 
   outputs = inputs:
@@ -30,35 +25,16 @@
       config = import ./configuration;
       pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
     in {
-      inherit inputs;
+      inputs = pkgs.lib.mapAttrs (_: input: pkgs.lib.mapAttrs (_: attr:  attr.x86_64-linux or attr) input) inputs;
       devShells.x86_64-linux.default = pkgs.mkShell {
         name = "linuxg-luigi";
         buildInputs = with pkgs; [ nil nixfmt ];
       };
       nixosConfigurations = {
-        wslg-pietro = nixosSystem {
-          modules = [ config ];
-          specialArgs = {
-            inherit inputs;
-            wsl = true;
-            mainUser = "pietro";
-          };
-          system = "x86_64-linux";
-        };
-        wslg-luigi = nixosSystem {
-          modules = [ config ];
-          specialArgs = {
-            inherit inputs;
-            wsl = true;
-            mainUser = "luigi";
-          };
-          system = "x86_64-linux";
-        };
         linuxg-luigi = nixosSystem {
           modules = [ config ];
           specialArgs = {
             inherit inputs;
-            wsl = false;
             mainUser = "luigi";
           };
           system = "x86_64-linux";

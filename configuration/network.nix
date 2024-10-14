@@ -1,13 +1,10 @@
 { pkgs, wsl, ... }: {
   networking.enableIPv6 = true;
-  networking.firewall.enable = !wsl;
-  networking.nameservers = [ "1.1.1.1" "1.0.0.1" ];
-  networking.useNetworkd = true;
-  networking.dhcpcd.enable = false;
-  networking.tcpcrypt.enable = true;
-  networking.usePredictableInterfaceNames = true;
-
   networking.nftables.enable = !wsl;
+  # networking.useNetworkd = true;
+  # networking.dhcpcd.enable = true;
+  # networking.tcpcrypt.enable = true;
+  networking.usePredictableInterfaceNames = true;
   networking.nftables.tables = {
     filter = {
       family = "inet";
@@ -48,19 +45,35 @@
   };
   environment.systemPackages = with pkgs; [ obexfs ];
 
-  users.users.tcpcryptd.group = "tcpcryptd";
-  users.groups.tcpcryptd = { };
+  # users.users.tcpcryptd.group = "tcpcryptd";
+  # users.users.iwd = {
+  #   group = "iwd";
+  #   isSystemUser = true;
+  # };
+  # users.groups.tcpcryptd = { };
+  # users.groups.iwd = { };
 
-  networking.wireless.iwd.enable = !wsl;
+  programs.nm-applet.enable = true;
+  # networking.wireless.iwd.enable = !wsl;
   networking.networkmanager = {
     enable = !wsl;
     dns = "systemd-resolved";
+    dhcp = "dhcpcd";
+    insertNameservers = [ "1.1.1.1" "1.0.0.1" ];
     wifi = {
-      backend = "iwd";
+      # backend = "iwd";
       powersave = true;
     };
+    # settings.main = {
+    #   iwd-config-path = "/var/lib/iwd";
+    # };
   };
 
+  # systemd.network.enable = true;
   systemd.network.wait-online.enable = false;
-  systemd.services.systemd-resolved.enable = true;
+  # systemd.services.systemd-resolved.enable = true;
+
+  # systemd.tmpfiles.rules = [
+  #   "d /var/lib/iwd 0770 iwd iwd"
+  # ];
 }

@@ -146,21 +146,34 @@
   hardware.uinput.enable = true;
   hardware.steam-hardware.enable = true;
 
-  programs.udevil.enable = !wsl;
+  programs.udevil.enable = true;
 
   hardware.usb-modeswitch.enable = true;
-  hardware.opengl = {
+  hardware.graphics = {
     enable = true;
-    driSupport = true;
-    driSupport32Bit = true;
     extraPackages = with pkgs; [
+      libvdpau-va-gl
+      intel-vaapi-driver
       intel-media-driver
       intel-ocl
       egl-wayland
       eglexternalplatform
+      nvidia-vaapi-driver
+      vaapi-intel-hybrid
+      libvdpau
+      libva
     ];
-    extraPackages32 = with pkgs; [ intel-media-driver ];
+    extraPackages32 = with pkgs; [
+      libvdpau-va-gl
+      intel-vaapi-driver
+      intel-media-driver
+      nvidia-vaapi-driver
+      vaapi-intel-hybrid
+      libvdpau
+      libva
+    ];
   };
+  hardware.nvidia.open = false;
   hardware.nvidia.modesetting.enable = true;
   hardware.nvidia.prime = {
     offload = {

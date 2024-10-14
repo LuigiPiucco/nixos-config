@@ -18,13 +18,18 @@
       "dialout"
       "uinput"
       "adbusers"
+      "gamemode"
     ];
     uid = 1000;
     group = "users";
     shell = pkgs.fish;
+    createHome = false;
   };
 
   home-manager.users.luigi = { config, osConfig, pkgs, ... }: {
+    imports = [
+    ];
+
     editorconfig = {
       enable = true;
       settings = {
@@ -44,19 +49,20 @@
     };
 
     home = {
+      preferXdgDirectories = true;
       enableNixpkgsReleaseCheck = true;
       stateVersion = "24.05";
     };
-    systemd.user.sessionVariables = {
+    home.sessionVariables = {
       EMAIL = "luigipiucco@gmail.com";
       STACK_XDG = "1";
-      JULIA_DEPOT_PATH = "${config.xdg.dataHome}/julia:";
+      JULIA_DEPOT_PATH = "${config.xdg.dataHome}/julia:${config.xdg.configHome}/julia";
       JULIAUP_DEPOT_PATH = "${config.xdg.dataHome}/julia";
     };
 
     programs.eza = {
       enable = true;
-      enableAliases = true;
+      enableFishIntegration = true;
       git = true;
       icons = true;
     };
@@ -156,11 +162,6 @@
       nix:
         enable: true
     '';
-    xdg.dataFile."dbus-1/services/org.freedesktop.secrets.service".text = ''
-      [D-BUS Service]
-      Name=org.freedesktop.secrets
-      Exec=${pkgs.keepassxc}/bin/keepassxc
-    '';
     nix = {
       enable = true;
       inherit (osConfig.nix) settings;
@@ -175,12 +176,8 @@
       enableExtraSocket = true;
       enableSshSupport = true;
       enableFishIntegration = true;
-      pinentryFlavor = if !wsl then "qt" else null;
       sshKeys = [ "87AF23A921179C8FF040FE3359B201DC3EF61234" ];
-      extraConfig = if wsl then ''
-        pinentry-program /mnt/c/Program Files (x86)/Gpg4win/bin/pinentry.exe
-      '' else
-        "";
+      pinentryPackage = pkgs.pinentry-qt;
     };
     programs.ssh.userKnownHostsFile = "${config.xdg.dataHome}/ssh/known_hosts";
   };

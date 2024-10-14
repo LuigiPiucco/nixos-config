@@ -1,7 +1,8 @@
-{ lib, inputs, wsl, mainUser, ... }: {
+{ inputs, mainUser, ... }: {
   imports = [
     inputs.home.nixosModules.default
     inputs.lanzaboote.nixosModules.lanzaboote
+    inputs.nix-ld.nixosModules.nix-ld
     ./base.nix
     ./hardware.nix
     ./network.nix
@@ -9,11 +10,10 @@
     ./users.nix
     ./kernel.nix
     ./desktop.nix
-  ] ++ lib.optionals wsl [ inputs.nixos-wsl.nixosModules.default ./wsl.nix ]
-    ++ lib.optional (!wsl) ./filesystems.nix
-    ++ lib.optional (mainUser == "luigi") ./luigi.nix
-    ++ lib.optional (mainUser == "pietro") ./pietro.nix;
+    ./filesystems.nix
+    ./luigi.nix
+  ];
 
   system.stateVersion = "24.05";
-  networking.hostName = "${if wsl then "wsl" else "linux"}g-${mainUser}";
+  networking.hostName = "linuxg-${mainUser}";
 }
