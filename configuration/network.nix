@@ -1,9 +1,6 @@
-{ pkgs, wsl, ... }: {
+{ pkgs, device, lib, ... }: {
   networking.enableIPv6 = true;
-  networking.nftables.enable = !wsl;
-  # networking.useNetworkd = true;
-  # networking.dhcpcd.enable = true;
-  # networking.tcpcrypt.enable = true;
+  networking.nftables.enable = true;
   networking.usePredictableInterfaceNames = true;
   networking.nftables.tables = {
     filter = {
@@ -36,7 +33,7 @@
   };
 
   hardware.bluetooth = {
-    enable = !wsl;
+    enable = true;
     package = pkgs.bluez5;
     input.General = {
       UserspaceHID = true;
@@ -45,35 +42,19 @@
   };
   environment.systemPackages = with pkgs; [ obexfs ];
 
-  # users.users.tcpcryptd.group = "tcpcryptd";
-  # users.users.iwd = {
-  #   group = "iwd";
-  #   isSystemUser = true;
-  # };
-  # users.groups.tcpcryptd = { };
-  # users.groups.iwd = { };
-
   programs.nm-applet.enable = true;
-  # networking.wireless.iwd.enable = !wsl;
+  networking.wireless.iwd.enable = device == "desktop";
   networking.networkmanager = {
-    enable = !wsl;
+    enable = true;
     dns = "systemd-resolved";
     dhcp = "dhcpcd";
     insertNameservers = [ "1.1.1.1" "1.0.0.1" ];
     wifi = {
-      # backend = "iwd";
       powersave = true;
+    } // lib.optionalAttrs (device == "desktop") {
+      backend = "iwd";
     };
-    # settings.main = {
-    #   iwd-config-path = "/var/lib/iwd";
-    # };
   };
 
-  # systemd.network.enable = true;
   systemd.network.wait-online.enable = false;
-  # systemd.services.systemd-resolved.enable = true;
-
-  # systemd.tmpfiles.rules = [
-  #   "d /var/lib/iwd 0770 iwd iwd"
-  # ];
 }

@@ -35,6 +35,16 @@
           modules = [ config ];
           specialArgs = {
             inherit inputs;
+            device = "laptop";
+            mainUser = "luigi";
+          };
+          system = "x86_64-linux";
+        };
+        towerg-luigi = nixosSystem {
+          modules = [ config ];
+          specialArgs = {
+            inherit inputs;
+            device = "desktop";
             mainUser = "luigi";
           };
           system = "x86_64-linux";

@@ -1,5 +1,7 @@
-{ pkgs, ... }: {
+{ pkgs, lib, ... }: {
   boot = {
+    supportedFilesystems.zfs = lib.mkForce false;
+
     kernelPackages = pkgs.linuxKernel.packages.linux_zen;
     kernelModules = [
       "kvm-intel"

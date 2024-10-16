@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, ... }: {
+{ config, pkgs, inputs, device, ... }: {
   programs.dconf.enable = true;
 
   i18n.inputMethod = {
@@ -33,6 +33,7 @@
         keyutils
         gamemode
         extest
+      ] ++ lib.optionals (device == "laptop") [
         nvidia-vaapi-driver
         config.hardware.nvidia.package
         config.hardware.nvidia.package.bin
@@ -50,6 +51,7 @@
         keyutils
         gamemode
         extest
+      ] ++ lib.optionals (device == "laptop") [
         nvidia-vaapi-driver
         config.hardware.nvidia.package
         config.hardware.nvidia.package.out
@@ -84,7 +86,6 @@
       arduino-cli
       protonup-qt
       partition-manager
-      egl-wayland
       freetype
       glib
       gsettings-desktop-schemas
@@ -94,7 +95,6 @@
       alacritty
       firefox
       libsForQt5.dolphin-plugins
-      nvidia-vaapi-driver
       ffmpeg_7
       prismlauncher
       nyxt
@@ -105,6 +105,9 @@
       vlc
       discord
       tor-browser
+    ] ++ lib.optionals (device == "laptop") [
+      egl-wayland
+      nvidia-vaapi-driver
     ];
 
     variables = {
@@ -481,7 +484,10 @@
     platformTheme = "kde";
     style = "breeze";
   };
-  services.desktopManager.plasma6.enable = true;
+  services.desktopManager.plasma6 = {
+    enable = true;
+    enableQt5Integration = true;
+  };
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
@@ -497,9 +503,9 @@
       gnome.enable = false;
     };
 
-    xkb.layout = "us,br";
-    xkb.variant = "intl,abnt2";
-    videoDrivers = [ "nvidia" ];
+    xkb.layout = { "laptop" = "us,br"; "desktop" = "us"; }.${device};
+    xkb.variant = { "laptop" = "intl,abnt2"; "desktop" = "intl"; }.${device};
+    videoDrivers = { "laptop" = [ "nvidia" ]; "desktop" = [ "amdgpu" "modesetting" "fbdev" ]; }.${device};
   };
 
   services.libinput = {

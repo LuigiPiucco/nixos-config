@@ -1,4 +1,4 @@
-{ pkgs, wsl, ... }: {
+{ pkgs, device, ... }: {
   hardware.keyboard.qmk.enable = true;
 
   services.udev = {
@@ -151,37 +151,57 @@
   hardware.usb-modeswitch.enable = true;
   hardware.graphics = {
     enable = true;
+    enable32Bit = true;
     extraPackages = with pkgs; [
+      egl-wayland
+      eglexternalplatform
       libvdpau-va-gl
+      libvdpau
+      libva
+    ] ++ lib.optionals (device == "laptop") [
       intel-vaapi-driver
       intel-media-driver
       intel-ocl
-      egl-wayland
-      eglexternalplatform
       nvidia-vaapi-driver
       vaapi-intel-hybrid
-      libvdpau
-      libva
+    ] ++ lib.optionals (device == "desktop") [
+      xorg.xf86videoamdgpu
     ];
     extraPackages32 = with pkgs; [
+      libvdpau
+      libva
+    ] ++ lib.optionals (device == "laptop") [
       libvdpau-va-gl
       intel-vaapi-driver
       intel-media-driver
       nvidia-vaapi-driver
       vaapi-intel-hybrid
-      libvdpau
-      libva
+      xorg.xf86videoamdgpu
     ];
   };
   hardware.nvidia.open = false;
-  hardware.nvidia.modesetting.enable = true;
+  hardware.nvidia.modesetting.enable = device == "laptop";
   hardware.nvidia.prime = {
     offload = {
-      enable = !wsl;
-      enableOffloadCmd = !wsl;
+      enable = device == "laptop";
+      enableOffloadCmd = device == "laptop";
     };
     nvidiaBusId = "PCI:1:0:0";
     intelBusId = "PCI:0:2:0";
+  };
+  hardware.amdgpu = {
+    amdvlk = {
+      enable = device == "desktop";
+      support32Bit.enable = device == "desktop";
+      supportExperimental.enable = device == "desktop";
+    };
+    initrd.enable = device == "desktop";
+    opencl.enable = device == "desktop";
+  };
+  hardware.cpu.amd = {
+    updateMicrocode = device == "desktop";
+    sev.enable = device == "desktop";
+    sevGuest.enable = device == "desktop";
   };
 
   environment.systemPackages = with pkgs; [ hidapi ];

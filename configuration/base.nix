@@ -1,10 +1,13 @@
-{ config, lib, pkgs, ... }:
+{ pkgs, ... }:
 {
   boot.tmp.cleanOnBoot = false;
   systemd.tmpfiles.rules = ["D! /tmp 1777 root root 0d"];
 
   security.lockKernelModules = true;
-  services.dbus.apparmor = "enabled";
+  services.dbus = {
+    apparmor = "enabled";
+    implementation = "broker";
+  };
   security.apparmor = {
     enable = true;
     killUnconfinedConfinables = true;
@@ -92,6 +95,14 @@
   hardware.enableRedistributableFirmware = true;
   hardware.enableAllFirmware = true;
   programs.usbtop.enable = true;
+
+  programs.corectrl = {
+    enable = true;
+    gpuOverclock = {
+      enable = true;
+      ppfeaturemask = "0xffffffff";
+    };
+  };
 
   boot.loader.systemd-boot.editor = false;
   boot.lanzaboote = {

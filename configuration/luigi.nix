@@ -1,4 +1,4 @@
-{ pkgs, wsl, ... }: {
+{ pkgs, lib, device, ... }: {
   users.users.root.hashedPassword =
     "$6$AuFJcsrir3QGAuqD$XavJkb/EsihqfAZLX86USxjX/i9mxRNiDi.e36vNSwKIsSjY9XbyBrVwwgR37X2uSrbpeWSbmBvOcnv2podCM/";
   users.users.luigi = {
@@ -19,6 +19,10 @@
       "uinput"
       "adbusers"
       "gamemode"
+    ] ++ lib.optionals (device == "desktop") [
+      "iwd"
+      "sev"
+      "sev-guest"
     ];
     uid = 1000;
     group = "users";
@@ -64,7 +68,7 @@
       enable = true;
       enableFishIntegration = true;
       git = true;
-      icons = true;
+      icons = "auto";
     };
 
     programs.bat.enable = true;
