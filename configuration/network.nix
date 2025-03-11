@@ -43,7 +43,8 @@
   environment.systemPackages = with pkgs; [ obexfs ];
 
   programs.nm-applet.enable = true;
-  networking.wireless.iwd.enable = device == "desktop";
+  services.resolved.enable = true;
+  networking.wireless.iwd.enable = device != "laptop";
   networking.networkmanager = {
     enable = true;
     dns = "systemd-resolved";
@@ -51,10 +52,11 @@
     insertNameservers = [ "1.1.1.1" "1.0.0.1" ];
     wifi = {
       powersave = true;
-    } // lib.optionalAttrs (device == "desktop") {
+    } // lib.optionalAttrs (device != "laptop") {
       backend = "iwd";
     };
   };
 
+  services.samba.enable = true;
   systemd.network.wait-online.enable = false;
 }

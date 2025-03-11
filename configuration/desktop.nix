@@ -1,5 +1,27 @@
-{ config, pkgs, inputs, device, ... }: {
+{ config, pkgs, inputs, lib, device, ... }: let
+  iosevkas = map (variant: pkgs.iosevka-bin.override { inherit variant; }) [
+    ""
+    "Curly"
+    "Etoile"
+  ];
+in {
   programs.dconf.enable = true;
+
+  programs.hyprland = {
+    enable = (device == "desktop");
+    withUWSM = true;
+    xwayland.enable = true;
+  };
+  programs.hyprlock.enable = (device == "desktop");
+  services.hypridle.enable = (device == "desktop");
+  programs.uwsm = {
+    enable = (device == "desktop");
+    waylandCompositors.hyprland = {
+      prettyName = "Hyprland";
+      comment = "Hyprland compositor managed by UWSM";
+      binPath = "/run/current-system/sw/bin/Hyprland";
+    };
+  };
 
   i18n.inputMethod = {
     enable = true;
@@ -19,51 +41,27 @@
   programs.steam = {
     enable = true;
     gamescopeSession.enable = true;
-    package = pkgs.steam.override {
-      extraPkgs = pkgs: with pkgs; [
-        xorg.libXcursor
-        xorg.libXi
-        xorg.libXinerama
-        xorg.libXScrnSaver
-        libpng
-        libpulseaudio
-        libvorbis
-        stdenv.cc.cc.lib
-        libkrb5
-        keyutils
-        gamemode
-        extest
-      ] ++ lib.optionals (device == "laptop") [
+    extest.enable = true;
+    package = pkgs.steam.override (old: {
+      extraPkgs = pkgs: (old.extraPkgs or lib.const []) pkgs ++ lib.optionals (device == "laptop") (with pkgs; [
         nvidia-vaapi-driver
         config.hardware.nvidia.package
         config.hardware.nvidia.package.bin
-      ];
-      extraLibraries = pkgs: with pkgs; [
-        xorg.libXcursor
-        xorg.libXi
-        xorg.libXinerama
-        xorg.libXScrnSaver
-        libpng
-        libpulseaudio
-        libvorbis
-        stdenv.cc.cc.lib
-        libkrb5
-        keyutils
-        gamemode
-        extest
-      ] ++ lib.optionals (device == "laptop") [
+      ]);
+      extraLibraries = pkgs: (old.extraLibraries or lib.const []) pkgs ++ lib.optionals (device == "laptop") (with pkgs; [
         nvidia-vaapi-driver
         config.hardware.nvidia.package
         config.hardware.nvidia.package.out
         config.hardware.nvidia.package.lib32
-      ];
-    };
+      ]);
+    });
+
     extraCompatPackages = with pkgs; [ proton-ge-bin ];
   };
   programs.gamescope = {
     enable = true;
     capSysNice = true;
-    env = {
+    env = lib.optionalAttrs (device == "laptop") {
       __NV_PRIME_RENDER_OFFLOAD = "1";
       __VK_LAYER_NV_optimus = "NVIDIA_only";
       __GLX_VENDOR_LIBRARY_NAME = "nvidia";
@@ -76,41 +74,61 @@
       general.renice = 10;
     };
   };
+  programs.partition-manager.enable = true;
 
   environment = {
     systemPackages = with pkgs; [
+      rpcs3
+      zulu
+      zulu17
       config.services.emacs.package
       lutris
       protontricks
-      arduino
-      arduino-cli
       protonup-qt
-      partition-manager
       freetype
       glib
       gsettings-desktop-schemas
       papirus-icon-theme
+      breeze-hacked-cursor-theme
       keepassxc
       polkit-kde-agent
+      inkscape-with-extensions
       alacritty
+      kitty
       firefox
+      kdePackages.plasma-browser-integration
       libsForQt5.dolphin-plugins
-      ffmpeg_7
+      ffmpeg
       prismlauncher
       nyxt
       typst
       typstfmt
-      typst-lsp
+      tinymist
       libreoffice-qt
       vlc
       discord
       tor-browser
+      piper
+      playerctl
+      brightnessctl
+      libwebp
     ] ++ lib.optionals (device == "laptop") [
       egl-wayland
       nvidia-vaapi-driver
+    ] ++ lib.optionals (device == "desktop") [
+      hyprpolkitagent
+      hyprpicker
+      dunst
+      waybar
+      mpvpaper
+      walker
+      clipse
+      iwgtk
+      blueberry
+      udiskie
     ];
 
-    variables = {
+    sessionVariables = {
       EDITOR = "emacsclient -a 'emacs'";
       VISUAL = "emacsclient -a 'emacs'";
       QT_AUTO_SCREEN_SCALE_FACTOR = "1";
@@ -118,16 +136,10 @@
       GDK_BACKEND = "wayland,xcb";
       CLUTTER_BACKEND = "wayland";
       GTK_USE_PORTAL = "1";
+      NIXOS_OZONE_WL = "1";
     };
   };
-
-  documentation = let enableAttr = { enable = true; };
-  in enableAttr // {
-    dev = enableAttr;
-    man = enableAttr;
-    doc = enableAttr;
-    info = enableAttr;
-  };
+  services.ratbagd.enable = true;
 
   services.emacs = {
     defaultEditor = true;
@@ -454,17 +466,11 @@
     fontconfig.defaultFonts.emoji = [ "Fira Code Symbol" "FiraCode Nerd Font" ];
 
     packages = with pkgs;
-      let
-        iosevkas = map (variant: iosevka-bin.override { inherit variant; }) [
-          ""
-          "Curly"
-          "Etoile"
-        ];
-      in iosevkas ++ [
+      iosevkas ++ [
         sarasa-gothic
         fira-code
         fira-code-symbols
-        fira-code-nerdfont
+        nerd-fonts.fira-code
         unicode-emoji
         unicode-character-database
         ucs-fonts
@@ -472,7 +478,7 @@
         liberation_ttf
         helvetica-neue-lt-std
         noto-fonts
-        noto-fonts-cjk
+        noto-fonts-cjk-sans
         noto-fonts-emoji
       ];
   };
@@ -488,9 +494,39 @@
     enable = true;
     enableQt5Integration = true;
   };
-  services.displayManager.sddm = {
+  programs.regreet = {
     enable = true;
-    wayland.enable = true;
+    cursorTheme = {
+      name = "Breeze_Hacked";
+      package = pkgs.breeze-hacked-cursor-theme;
+    };
+    font = {
+      name = "Iosevka Etoile";
+      size = 16;
+      package = builtins.elemAt iosevkas 1;
+    };
+    iconTheme = {
+      name = "candy-icons";
+      package = pkgs.candy-icons;
+    };
+    theme = {
+      name = "Sweet-Dark";
+      package = pkgs.sweet;
+    };
+    settings = {
+      background.path = "${../data}/greeter/wallpaper.webp";
+      GTK.application_prefer_dark_theme = true;
+      "widget.clock" = {};
+    };
+  };
+  services.greetd = {
+    enable = true;
+    # settings = {
+    #   default_session = {
+    #     command = "Hyprland --config ${../data}/greeter/hyprland.conf";
+    #     user = "greeter";
+    #   };
+    # };
   };
   services.xserver = {
     enable = true;
@@ -505,7 +541,7 @@
 
     xkb.layout = { "laptop" = "us,br"; "desktop" = "us"; }.${device};
     xkb.variant = { "laptop" = "intl,abnt2"; "desktop" = "intl"; }.${device};
-    videoDrivers = { "laptop" = [ "nvidia" ]; "desktop" = [ "amdgpu" "modesetting" "fbdev" ]; }.${device};
+    videoDrivers = { "laptop" = [ "nvidia" ]; "desktop" = [ "amdgpu" ]; }.${device};
   };
 
   services.libinput = {
@@ -517,10 +553,10 @@
     };
   };
 
+  services.flatpak.enable = true;
   xdg.portal = {
     enable = true;
-    config.common.default = [ "kde" "gtk" ];
-    extraPortals = with pkgs; [ xdg-desktop-portal-kde ];
+    config.common.default = lib.optional (device == "desktop") "hyprland" ++ [ "kde" "gtk" ];
     xdgOpenUsePortal = true;
   };
 

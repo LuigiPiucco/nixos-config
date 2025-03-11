@@ -1,9 +1,8 @@
-{ pkgs, ... }:
+{ pkgs, lib, device, mainUser, inputs, ... }:
 {
   boot.tmp.cleanOnBoot = false;
   systemd.tmpfiles.rules = ["D! /tmp 1777 root root 0d"];
 
-  security.lockKernelModules = true;
   services.dbus = {
     apparmor = "enabled";
     implementation = "broker";
@@ -26,6 +25,7 @@
       binutils
       coreutils
       curl
+      wget
       dnsutils
       bottom
       manix
@@ -54,6 +54,7 @@
       dxvk
       vkd3d
       vkd3d-proton
+      python3
     ];
 
     sessionVariables = { PAGER = "less"; };
@@ -69,16 +70,41 @@
     };
   };
 
-  programs.nix-ld.dev.enable = true;
+  programs.nix-ld.dev = {
+    libraries = with pkgs; [
+      libGL
+      libusb1
+      libftdi1
+      stdenv.cc.libc
+      stdenv.cc.cc
+      zlib
+      e2fsprogs
+      libgpg-error
+      xorg.libX11
+      libsForQt5.qt5.qtwayland
+    ];
+    enable = true;
+  };
   programs.command-not-found.enable = false;
   programs.ssh.enableAskPassword = false;
+
+
+  documentation = {
+    dev.enable = true;
+    man.enable = true;
+    doc.enable = true;
+    info.enable = true;
+  };
 
   nixpkgs.config.allowUnfree = true;
 
   i18n = {
     supportedLocales =
       [ "en_US.UTF-8/UTF-8" "pt_BR.UTF-8/UTF-8" "ja_JP.UTF-8/UTF-8" ];
-    defaultLocale = "en_US.UTF-8";
+    defaultLocale = {
+      "luigi" = "en_US.UTF-8";
+      "pietro" = "pt_BR.UTF-8";
+    }.${mainUser};
   };
 
   console = {
@@ -91,10 +117,42 @@
     hardwareClockInLocalTime = true;
   };
 
-  boot.loader.efi.canTouchEfiVariables = true;
+  programs.usbtop.enable = true;
+
+  programs.gnupg.agent = {
+    enable = true;
+    pinentryPackage = pkgs.pinentry-qt;
+    enableSSHSupport = true;
+    enableExtraSocket = true;
+    enableBrowserSocket = true;
+  };
+
+  wsl = {
+    enable = device == "wsl";
+    defaultUser = "pietro";
+    usbip.enable = true;
+    wslConf.network.generateResolvConf = false;
+    tarball.configPath = inputs.self;
+  };
+} // lib.optionalAttrs (device != "wsl") {
+  services.syncthing = {
+    enable = true;
+    overrideDevices = false;
+    overrideFolders = false;
+  };
+  services.fwupd.enable = true;
+  services.udisks2.enable = true;
+
   hardware.enableRedistributableFirmware = true;
   hardware.enableAllFirmware = true;
-  programs.usbtop.enable = true;
+  boot.loader.systemd-boot.editor = false;
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.lanzaboote = {
+    enable = true;
+    pkiBundle = "/var/lib/sbctl";
+    # enrollKeys = true;
+    configurationLimit = 3;
+  };
 
   programs.corectrl = {
     enable = true;
@@ -104,17 +162,4 @@
     };
   };
 
-  boot.loader.systemd-boot.editor = false;
-  boot.lanzaboote = {
-    enable = true;
-    pkiBundle = "/etc/secureboot";
-  };
-
-  services.fwupd.enable = true;
-  services.udisks2.enable = true;
-  services.syncthing = {
-    enable = true;
-    overrideDevices = false;
-    overrideFolders = false;
-  };
 }

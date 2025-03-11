@@ -1,13 +1,21 @@
 { pkgs, device, ... }: {
   hardware.keyboard.qmk.enable = true;
+  # hardware.xone.enable = true;
+  hardware.xpadneo.enable = true;
 
   services.udev = {
     enable = true;
-    packages = with pkgs; [ libftdi1 qmk-udev-rules android-udev-rules ];
+    packages = with pkgs; [ libftdi1 qmk-udev-rules android-udev-rules game-devices-udev-rules libusb1 ];
     extraRules = ''
       # Copy this file to /etc/udev/rules.d/
       # If rules fail to reload automatically, you can refresh udev rules
       # with the command "udevadm control --reload"
+
+      SUBSYSTEMS=="usb-serial", TAG+="uaccess"
+
+      # 8BitDo Pro 2 Wired; USB
+      ## X-Mode
+      SUBSYSTEM=="usb", ATTR{idProduct}=="3106", ATTR{idVendor}=="2dc8", DRIVER="usbhid", TAG+="uaccess"
 
       # This rules are based on the udev rules from the OpenOCD project, with unsupported probes removed.
       # See http://openocd.org/ for more details.
@@ -166,8 +174,9 @@
       vaapi-intel-hybrid
     ] ++ lib.optionals (device == "desktop") [
       xorg.xf86videoamdgpu
+      amdvlk
     ];
-    extraPackages32 = with pkgs; [
+    extraPackages32 = with pkgs; with driversi686Linux; [
       libvdpau
       libva
     ] ++ lib.optionals (device == "laptop") [
@@ -176,7 +185,9 @@
       intel-media-driver
       nvidia-vaapi-driver
       vaapi-intel-hybrid
+    ] ++ lib.optionals (device == "desktop") [
       xorg.xf86videoamdgpu
+      amdvlk
     ];
   };
   hardware.nvidia.open = false;

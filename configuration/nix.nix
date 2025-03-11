@@ -1,4 +1,4 @@
-{
+{ device, ... }: {
   nix.channel.enable = false;
   nix.daemonIOSchedClass = "best-effort";
   nix.daemonIOSchedPriority = 2;
@@ -11,7 +11,11 @@
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
     auto-optimise-store = true;
-    cores = 8;
+    cores = {
+      "laptop" = 8;
+      "desktop" = 16;
+      "wsl" = 4;
+    }.${device};
     extra-experimental-features = [
       "ca-derivations"
       "flakes"
@@ -19,9 +23,13 @@
       "no-url-literals"
     ];
     keep-derivations = false;
-    keep-outputs = false;
+    keep-outputs = true;
     keep-failed = false;
-    max-jobs = 8;
+    max-jobs = {
+      "laptop" = 8;
+      "desktop" = 16;
+      "wsl" = 4;
+    }.${device};
     print-missing = true;
     sandbox = true;
     trusted-users = [ "root" "@wheel" ];
@@ -30,7 +38,7 @@
   nix.gc = {
     automatic = true;
     dates = "weekly";
-    options = "--delete-older-than 2d";
+    options = "--delete-older-than 10d";
     persistent = true;
   };
   nix.optimise = {

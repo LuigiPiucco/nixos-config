@@ -2,9 +2,13 @@
   description = "Luigi's system config.";
 
   nixConfig = {
-    extra-substituters = [ "https://nix-community.cachix.org" ];
+    extra-substituters = [
+      "https://nix-community.cachix.org"
+      "https://hyprland.cachix.org"
+    ];
     extra-trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
     ];
   };
 
@@ -16,7 +20,9 @@
     nix-ld.inputs.nixpkgs.follows = "nixpkgs";
     lanzaboote.url = "github:nix-community/lanzaboote";
     lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
+    hyprland.url = "github:hyprwm/Hyprland";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
+    nixos-wsl.url = "github:nix-community/NixOS-WSL";
   };
 
   outputs = inputs:
@@ -27,28 +33,48 @@
     in {
       inputs = pkgs.lib.mapAttrs (_: input: pkgs.lib.mapAttrs (_: attr:  attr.x86_64-linux or attr) input) inputs;
       devShells.x86_64-linux.default = pkgs.mkShell {
-        name = "linuxg-luigi";
-        buildInputs = with pkgs; [ nil nixfmt ];
+        name = "config-luigi";
+        buildInputs = with pkgs; [ nil nixfmt-rfc-style ];
       };
-      nixosConfigurations = {
-        linuxg-luigi = nixosSystem {
+      nixosConfigurations = let
+        inherit (pkgs) lib;
+        base-configs = {
+          laptopg-luigi = {
+            modules = [ config ];
+            specialArgs = {
+              inherit inputs;
+              device = "laptop";
+              mainUser = "luigi";
+            };
+            system = "x86_64-linux";
+          };
+          towerg-luigi = {
+            modules = [ config ];
+            specialArgs = {
+              inherit inputs;
+              device = "desktop";
+              mainUser = "luigi";
+              install-cd = false;
+            };
+            system = "x86_64-linux";
+          };
+        };
+        install-configs =
+          pkgs.lib.mapAttrs' (name: value: {
+            name = "${name}-install";
+            value = lib.attrsets.updateManyAttrsByPath [{ path = ["specialArgs" "install-cd"]; update = old: !old; }] value;
+          }) base-configs;
+        wsl-configs.wslg-pietro = {
           modules = [ config ];
           specialArgs = {
             inherit inputs;
-            device = "laptop";
-            mainUser = "luigi";
+            device = "wsl";
+            mainUser = "pietro";
+            install-cd = false;
           };
           system = "x86_64-linux";
         };
-        towerg-luigi = nixosSystem {
-          modules = [ config ];
-          specialArgs = {
-            inherit inputs;
-            device = "desktop";
-            mainUser = "luigi";
-          };
-          system = "x86_64-linux";
-        };
-      };
+        all-configs = base-configs // install-configs // wsl-configs;
+      in lib.mapAttrs (_: conf: nixosSystem conf) all-configs;
     };
 }
