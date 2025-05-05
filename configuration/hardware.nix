@@ -175,6 +175,7 @@
     ] ++ lib.optionals (device == "desktop") [
       xorg.xf86videoamdgpu
       amdvlk
+      vulkan-hdr-layer-kwin6
     ];
     extraPackages32 = with pkgs; with driversi686Linux; [
       libvdpau
@@ -188,6 +189,7 @@
     ] ++ lib.optionals (device == "desktop") [
       xorg.xf86videoamdgpu
       amdvlk
+      vulkan-hdr-layer-kwin6
     ];
   };
   hardware.nvidia.open = false;
@@ -215,5 +217,8 @@
     sevGuest.enable = device == "desktop";
   };
 
-  environment.systemPackages = with pkgs; [ hidapi ];
+  environment.systemPackages = with pkgs; [
+    vulkan-hdr-layer-kwin6
+    hidapi
+  ];
 }

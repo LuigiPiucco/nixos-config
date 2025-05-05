@@ -91,10 +91,9 @@ in {
       papirus-icon-theme
       breeze-hacked-cursor-theme
       keepassxc
-      polkit-kde-agent
+      kdePackages.polkit-kde-agent-1
       inkscape-with-extensions
       alacritty
-      kitty
       firefox
       kdePackages.plasma-browser-integration
       libsForQt5.dolphin-plugins
@@ -112,6 +111,12 @@ in {
       playerctl
       brightnessctl
       libwebp
+      nuspell
+      hunspell
+      hunspellDicts.en_US
+      hunspellDicts.pt_BR
+      enchant
+      stdenv.cc
     ] ++ lib.optionals (device == "laptop") [
       egl-wayland
       nvidia-vaapi-driver
@@ -144,8 +149,8 @@ in {
   services.emacs = {
     defaultEditor = true;
     package = let
-      inherit (inputs.emacs-overlay.packages.x86_64-linux) emacs-pgtk;
-      emacs = emacs-pgtk.pkgs;
+      inherit (inputs.emacs-overlay.packages.x86_64-linux) emacs-git;
+      emacs = emacs-git.pkgs;
     in emacs.withPackages (epkgs:
       with epkgs;
       with epkgs.manualPackages;
@@ -153,6 +158,7 @@ in {
       with epkgs.nongnuPackages;
       with epkgs.elpaPackages;
       with epkgs.melpaPackages; [
+        jinx
       #   a
       #   ace-window
       #   aio

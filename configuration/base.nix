@@ -17,6 +17,7 @@
 
   environment = {
     systemPackages = with pkgs; [
+      helix
       pijul
       pciutils
       sbctl
@@ -26,6 +27,7 @@
       coreutils
       curl
       wget
+      unzip
       dnsutils
       bottom
       manix
