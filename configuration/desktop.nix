@@ -65,6 +65,8 @@ in {
       __NV_PRIME_RENDER_OFFLOAD = "1";
       __VK_LAYER_NV_optimus = "NVIDIA_only";
       __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    } // lib.optionalAttrs (device == "desktop") {
+      VK_ICD_FILENAMES = "/run/opengl-driver/share/vulkan/icd.d/radeon_icd.x86_64.json";
     };
   };
   programs.gamemode = {
