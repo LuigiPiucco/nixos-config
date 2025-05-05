@@ -76,6 +76,22 @@
       icons = "auto";
     };
 
+
+    systemd.user.services.gpg-agent.Service.ExecStartPost = "/bin/sh -c 'systemctl --user set-environment SSH_AUTH_SOCK=$$(gpgconf --list-dirs agent-ssh-socket)'";
+    systemd.user.services.keepassxc = {
+      Unit = {
+        Description = "KeepassXC Password Manager";
+        After = ["gpg-agent.service" "graphical-session.target"];
+      };
+      Service = {
+        Type = "exec";
+        ExecStart = "/run/current-system/sw/bin/keepassxc --minimized %h/Secrets/OldPasswords.kdbx";
+      };
+      Install = {
+        WantedBy = ["graphical-session.target"];
+      };
+    };
+
     programs.bat.enable = true;
     programs.fish = {
       enable = true;
@@ -364,14 +380,14 @@
       enable = true;
       homedir = "${config.xdg.dataHome}/gnupg";
     };
-    # services.gpg-agent = {
-    #   enable = true;
-    #   enableExtraSocket = true;
-    #   enableSshSupport = true;
-    #   enableFishIntegration = true;
-    #   sshKeys = [ "87AF23A921179C8FF040FE3359B201DC3EF61234" ];
-    #   pinentryPackage = pkgs.pinentry-qt;
-    # };
+    services.gpg-agent = {
+      enable = true;
+      enableExtraSocket = true;
+      enableSshSupport = true;
+      enableFishIntegration = true;
+      sshKeys = [ "87AF23A921179C8FF040FE3359B201DC3EF61234" ];
+      pinentryPackage = pkgs.pinentry-qt;
+    };
     programs.ssh.userKnownHostsFile = "${config.xdg.dataHome}/ssh/known_hosts";
   };
 }
