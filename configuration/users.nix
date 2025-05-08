@@ -21,4 +21,8 @@
   users.defaultUserShell = pkgs.fish;
 } // lib.optionalAttrs (device == "wsl") {
   users.users.root.password = "nopassword";
+} // lib.optionalAttrs (device == "rpi") {
+  users.extraGroups.i2c = {};
+  users.extraGroups.spi = {};
+  users.extraGroups.gpio = {};
 }

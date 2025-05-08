@@ -52,10 +52,6 @@
       p7zip
       xdg-dbus-proxy
       libsecret
-      wineWowPackages.stagingFull
-      dxvk
-      vkd3d
-      vkd3d-proton
       python3
     ];
 
@@ -136,7 +132,7 @@
     wslConf.network.generateResolvConf = false;
     tarball.configPath = inputs.self;
   };
-} // lib.optionalAttrs (device != "wsl") {
+} // lib.optionalAttrs (device != "wsl" && device != "rpi") {
   services.syncthing = {
     enable = true;
     overrideDevices = false;
@@ -164,4 +160,16 @@
     };
   };
 
+} // lib.optionalAttrs (device == "rpi") {
+  hardware.raspberry-pi."4" = {
+    audio.enable = true;
+    bluetooth.enable = true;
+    i2c1.enable = true;
+    fkms-3d = {
+      enable = true;
+      cma = 1024;
+    };
+    pwm0.enable = true;
+    xhci.enable = true;
+  };
 }

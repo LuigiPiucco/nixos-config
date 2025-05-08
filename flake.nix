@@ -23,6 +23,7 @@
     hyprland.url = "github:hyprwm/Hyprland";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
   };
 
   outputs = inputs:
@@ -53,6 +54,16 @@
             specialArgs = {
               inherit inputs;
               device = "desktop";
+              mainUser = "luigi";
+              install-cd = false;
+            };
+            system = "x86_64-linux";
+          };
+          rpi-luigi = {
+            modules = [ config ];
+            specialArgs = {
+              inherit inputs;
+              device = "rpi";
               mainUser = "luigi";
               install-cd = false;
             };

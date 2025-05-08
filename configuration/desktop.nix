@@ -39,7 +39,7 @@ in {
   };
 
   programs.steam = {
-    enable = true;
+    enable = (device == "desktop");
     gamescopeSession.enable = true;
     extest.enable = true;
     package = pkgs.steam.override (old: {
@@ -59,7 +59,7 @@ in {
     extraCompatPackages = with pkgs; [ proton-ge-bin ];
   };
   programs.gamescope = {
-    enable = true;
+    enable = (device == "desktop");
     capSysNice = true;
     env = lib.optionalAttrs (device == "laptop") {
       __NV_PRIME_RENDER_OFFLOAD = "1";
@@ -70,7 +70,7 @@ in {
     };
   };
   programs.gamemode = {
-    enable = true;
+    enable = (device == "desktop");
     enableRenice = true;
     settings = {
       general.renice = 10;
@@ -80,13 +80,7 @@ in {
 
   environment = {
     systemPackages = with pkgs; [
-      rpcs3
-      zulu
-      zulu17
       config.services.emacs.package
-      lutris
-      protontricks
-      protonup-qt
       freetype
       glib
       gsettings-desktop-schemas
@@ -97,19 +91,14 @@ in {
       inkscape-with-extensions
       alacritty
       firefox
-      kdePackages.plasma-browser-integration
       libsForQt5.dolphin-plugins
       ffmpeg
-      prismlauncher
       nyxt
       typst
       typstfmt
       tinymist
       libreoffice-qt
       vlc
-      discord
-      tor-browser
-      piper
       playerctl
       brightnessctl
       libwebp
@@ -133,6 +122,20 @@ in {
       iwgtk
       blueberry
       udiskie
+      rpcs3
+      zulu
+      zulu17
+      lutris
+      protontricks
+      protonup-qt
+      prismlauncher
+      discord
+      tor-browser
+      piper
+      wineWowPackages.stagingFull
+      dxvk
+      vkd3d
+      vkd3d-proton
     ];
 
     sessionVariables = {

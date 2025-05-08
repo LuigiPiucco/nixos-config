@@ -21,6 +21,10 @@
       "iwd"
       "sev"
       "sev-guest"
+    ] ++ lib.optionals (device == "rpi") [
+      "i2c"
+      "spi"
+      "gpio"
     ];
     uid = 1000;
     group = "users";

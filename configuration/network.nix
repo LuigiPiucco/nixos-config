@@ -51,12 +51,12 @@
     dhcp = "dhcpcd";
     insertNameservers = [ "1.1.1.1" "1.0.0.1" ];
     wifi = {
-      powersave = true;
+      powersave = device != "rpi";
     } // lib.optionalAttrs (device != "laptop") {
       backend = "iwd";
     };
   };
 
-  services.samba.enable = true;
+  services.samba.enable = device != "rpi";
   systemd.network.wait-online.enable = false;
 }

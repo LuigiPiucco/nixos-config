@@ -13,6 +13,7 @@
     ./${mainUser}.nix
   ]
   ++ lib.optional install-cd "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-base.nix"
+  ++ lib.optional (device == "rpi") "${inputs.nixos-hardware}/raspberry-pi/4"
   ++ lib.optionals (device != "wsl") [ ./desktop.nix ./kernel.nix  ./filesystems.nix ];
 
   system.stateVersion = "25.05";
