@@ -77,6 +77,10 @@ in {
     };
   };
   programs.partition-manager.enable = true;
+  programs.firefox = {
+    enable = true;
+    nativeMessagingHosts.packages = with pkgs; [kdePackages.plasma-browser-integration];
+  };
 
   environment = {
     systemPackages = with pkgs; [
@@ -90,7 +94,6 @@ in {
       kdePackages.polkit-kde-agent-1
       inkscape-with-extensions
       alacritty
-      firefox
       libsForQt5.dolphin-plugins
       ffmpeg
       nyxt
@@ -567,8 +570,9 @@ in {
   services.flatpak.enable = true;
   xdg.portal = {
     enable = true;
-    config.common.default = lib.optional (device == "desktop") "hyprland" ++ [ "kde" "gtk" ];
+    config.common.default = [ "kde" "gtk" ] ++ lib.optional (device == "desktop") "hyprland";
     xdgOpenUsePortal = true;
+    extraPortals = with pkgs; [ kdePackages.xdg-desktop-portal-kde xdg-desktop-portal-gtk ];
   };
 
   services.pipewire = {
