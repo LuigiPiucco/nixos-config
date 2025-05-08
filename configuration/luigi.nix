@@ -390,7 +390,7 @@
       enableSshSupport = true;
       enableFishIntegration = true;
       sshKeys = [ "87AF23A921179C8FF040FE3359B201DC3EF61234" ];
-      pinentryPackage = pkgs.pinentry-qt;
+      pinentry.package = pkgs.pinentry-qt;
     };
     programs.ssh.userKnownHostsFile = "${config.xdg.dataHome}/ssh/known_hosts";
   };
