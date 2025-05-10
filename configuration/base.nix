@@ -17,10 +17,7 @@
 
   environment = {
     systemPackages = with pkgs; [
-      helix
-      pijul
       pciutils
-      sbctl
       zstd
       unrar
       binutils
@@ -30,13 +27,11 @@
       unzip
       dnsutils
       bottom
-      manix
       bat
       eza
       procs
       usbutils
       nix-direnv
-      ntfs3g
       starship
       direnv
       fd
@@ -45,14 +40,19 @@
       bat
       git-lfs
       zoxide
-      man-pages
-      stdmanpages
       socat
       ltex-ls
       p7zip
       xdg-dbus-proxy
       libsecret
       python3
+    ] ++ lib.optionals (device != "rpi") [
+      manix
+      man-pages
+      stdmanpages
+      helix
+      pijul
+      sbctl
     ];
 
     sessionVariables = { PAGER = "less"; };
@@ -73,32 +73,29 @@
       libGL
       libusb1
       libftdi1
-      stdenv.cc.libc
-      stdenv.cc.cc
       zlib
       e2fsprogs
       libgpg-error
-      xorg.libX11
-      libsForQt5.qt5.qtwayland
     ];
     enable = true;
   };
   programs.command-not-found.enable = false;
   programs.ssh.enableAskPassword = false;
 
-
   documentation = {
-    dev.enable = true;
-    man.enable = true;
-    doc.enable = true;
-    info.enable = true;
+    dev.enable  = device != "rpi";
+    man.enable  = device != "rpi";
+    doc.enable  = device != "rpi";
+    info.enable = device != "rpi";
   };
 
   nixpkgs.config.allowUnfree = true;
 
   i18n = {
-    supportedLocales =
-      [ "en_US.UTF-8/UTF-8" "pt_BR.UTF-8/UTF-8" "ja_JP.UTF-8/UTF-8" ];
+    supportedLocales = [
+      "en_US.UTF-8/UTF-8"
+      "pt_BR.UTF-8/UTF-8"
+    ] ++ lib.optional (mainUser == "luigi" && device != "rpi") "ja_JP.UTF-8/UTF-8";
     defaultLocale = {
       "luigi" = "en_US.UTF-8";
       "pietro" = "pt_BR.UTF-8";
@@ -106,6 +103,7 @@
   };
 
   console = {
+    enable = true;
     font = "Lat2-Terminus16";
     useXkbConfig = true;
   };
@@ -115,7 +113,7 @@
     hardwareClockInLocalTime = true;
   };
 
-  programs.usbtop.enable = true;
+  programs.usbtop.enable = device != "rpi";
 
   programs.gnupg.agent = {
     enable = true;
@@ -132,6 +130,12 @@
     wslConf.network.generateResolvConf = false;
     tarball.configPath = inputs.self;
   };
+
+  boot.loader.systemd-boot.editor = false;
+
+  services.udisks2.enable = true;
+
+  environment.pathsToLink = [ "/share/xdg-desktop-portal" "/share/applications" ];
 } // lib.optionalAttrs (device != "wsl" && device != "rpi") {
   services.syncthing = {
     enable = true;
@@ -139,11 +143,6 @@
     overrideFolders = false;
   };
   services.fwupd.enable = true;
-  services.udisks2.enable = true;
-
-  hardware.enableRedistributableFirmware = true;
-  hardware.enableAllFirmware = true;
-  boot.loader.systemd-boot.editor = false;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.lanzaboote = {
     enable = true;
@@ -159,19 +158,4 @@
       ppfeaturemask = "0xffffffff";
     };
   };
-
-} // lib.optionalAttrs (device == "rpi") {
-  hardware.raspberry-pi."4" = {
-    audio.enable = true;
-    bluetooth.enable = true;
-    i2c1.enable = true;
-    fkms-3d = {
-      enable = true;
-      cma = 1024;
-    };
-    pwm0.enable = true;
-    xhci.enable = true;
-  };
-
-  environment.pathsToLink = [ "/share/xdg-desktop-portal" "/share/applications" ];
 }

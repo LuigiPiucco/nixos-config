@@ -1,6 +1,6 @@
 { pkgs, device, install-cd, lib, ... }: {
-  users.extraGroups.adbusers = { };
-  users.extraGroups.plugdev = { };
+  users.extraGroups.adbusers = {};
+  users.extraGroups.plugdev = {};
 
   programs.fish.enable = true;
 

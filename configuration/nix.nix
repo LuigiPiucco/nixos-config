@@ -1,10 +1,11 @@
-{ device, ... }: {
+{ device, inputs, ... }: {
   nix.channel.enable = false;
   nix.daemonIOSchedClass = "best-effort";
   nix.daemonIOSchedPriority = 2;
   nix.daemonCPUSchedPolicy = "other";
   nix.settings = {
     allowed-users = [ "@users" ];
+    extra-platforms = [ "aarch64-linux" ];
     extra-allowed-uris = [ "file:/" ];
     extra-substituters = [ "https://nix-community.cachix.org" ];
     extra-trusted-public-keys = [
@@ -15,6 +16,7 @@
       "laptop" = 8;
       "desktop" = 16;
       "wsl" = 4;
+      "rpi" = 4;
     }.${device};
     extra-experimental-features = [
       "ca-derivations"
@@ -26,9 +28,10 @@
     keep-outputs = true;
     keep-failed = false;
     max-jobs = {
-      "laptop" = 8;
-      "desktop" = 16;
+      "laptop" = 6;
+      "desktop" = 12;
       "wsl" = 4;
+      "rpi" = 2;
     }.${device};
     print-missing = true;
     sandbox = true;
@@ -45,4 +48,6 @@
     automatic = true;
     dates = [ "daily" ];
   };
+
+  nixpkgs.overlays = [inputs.emacs-overlay.overlays.default];
 }

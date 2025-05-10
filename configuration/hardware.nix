@@ -1,26 +1,22 @@
-{ pkgs, device, ... }: {
+{ pkgs, device, lib, ... }: {
   hardware.keyboard.qmk.enable = true;
   # hardware.xone.enable = true;
-  hardware.xpadneo.enable = true;
+  hardware.xpadneo.enable = (device != "rpi");
 
   services.udev = {
     enable = true;
-    packages = with pkgs; [ libftdi1 qmk-udev-rules android-udev-rules game-devices-udev-rules libusb1 ];
+    packages = with pkgs; [ libftdi1 libusb1 ] ++ lib.optionals (device != "rpi") [
+      qmk-udev-rules android-udev-rules game-devices-udev-rules
+    ];
     extraRules = ''
-      # Copy this file to /etc/udev/rules.d/
-      # If rules fail to reload automatically, you can refresh udev rules
-      # with the command "udevadm control --reload"
-
       SUBSYSTEMS=="usb-serial", TAG+="uaccess"
 
       # 8BitDo Pro 2 Wired; USB
       ## X-Mode
-      SUBSYSTEM=="usb", ATTR{idProduct}=="3106", ATTR{idVendor}=="2dc8", DRIVER="usbhid", TAG+="uaccess"
+      SUBSYSTEM=="usb", ATTR{idProduct}=="3106", ATTR{idVendor}=="2dc8", DRIVER=="usbhid", TAG+="uaccess"
 
       # This rules are based on the udev rules from the OpenOCD project, with unsupported probes removed.
       # See http://openocd.org/ for more details.
-      #
-      # This file is available under the GNU General Public License v2.0
 
       ACTION!="add|change", GOTO="probe_rs_rules_end"
 
@@ -147,26 +143,34 @@
       ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="8011", MODE="660", GROUP="plugdev", TAG+="uaccess"
 
       LABEL="probe_rs_rules_end"
-    '';
+    '' + lib.optionalString (device == "rpi") ''
+      # Raspberry-Pi GPIO
+      KERNEL=="spidev*", GROUP="spi", MODE="0660", TAG+="uaccess"
+      SUBSYSTEM=="gpio*", PROGRAM="/bin/sh -c 'chown -R root:gpio /sys/class/gpio && chmod -R 775 /sys/class/gpio; chown -R root:gpio /sys/devices/virtual/gpio && chmod -R 775 /sys/devices/virtual/gpio; chown -R root:gpio /sys/devices/platform/soc/*.gpio/gpio && chmod -R 775 /sys/devices/platform/soc/*.gpio/gpio'"
+      SUBSYSTEM=="gpio", KERNEL=="gpiochip*", ACTION=="add", PROGRAM="/bin/sh -c 'chown root:gpio /sys/class/gpio/export /sys/class/gpio/unexport ; chmod 220 /sys/class/gpio/export /sys/class/gpio/unexport'"
+      SUBSYSTEM=="gpio", KERNEL=="gpio*", ACTION=="add", PROGRAM="/bin/sh -c 'chown root:gpio /sys%p/active_low /sys%p/direction /sys%p/edge /sys%p/value ; chmod 660 /sys%p/active_low /sys%p/direction /sys%p/edge /sys%p/value'"
+     '';
   };
 
-  hardware.ksm.enable = true;
+  hardware.ksm.enable = false;
   hardware.uinput.enable = true;
-  hardware.steam-hardware.enable = true;
+  hardware.steam-hardware.enable = device != "rpi";
 
   programs.udevil.enable = true;
-
+  hardware.deviceTree = {
+    enable = true;
+  };
   hardware.usb-modeswitch.enable = true;
   hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
+    enable = device != "rpi";
+    enable32Bit = device != "rpi";
     extraPackages = with pkgs; [
+      libva
+    ] ++ lib.optionals (device == "laptop") [
       egl-wayland
       eglexternalplatform
       libvdpau-va-gl
       libvdpau
-      libva
-    ] ++ lib.optionals (device == "laptop") [
       intel-vaapi-driver
       intel-media-driver
       intel-ocl
@@ -217,8 +221,22 @@
     sevGuest.enable = device == "desktop";
   };
 
+  hardware.enableRedistributableFirmware = true;
+  hardware.enableAllFirmware = if device != "rpi" then true else lib.mkForce false;
+  hardware.enableAllHardware = if device != "rpi" then true else lib.mkForce false;
+
   environment.systemPackages = with pkgs; [
-    vulkan-hdr-layer-kwin6
     hidapi
   ];
+} // lib.optionalAttrs (device == "rpi") {
+  hardware.raspberry-pi."4" = {
+    bluetooth.enable = true;
+    i2c1.enable = true;
+    fkms-3d = {
+      enable = true;
+      cma = 1024;
+    };
+    pwm0.enable = true;
+    # xhci.enable = true;
+  };
 }

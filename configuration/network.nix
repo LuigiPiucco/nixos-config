@@ -40,11 +40,9 @@
       ClassicBondedOnly = false;
     };
   };
-  environment.systemPackages = with pkgs; [ obexfs ];
+  environment.systemPackages = with pkgs; [sshfs] ++ lib.optional (device != "rpi") obexfs;
 
-  programs.nm-applet.enable = true;
   services.resolved.enable = true;
-  networking.wireless.iwd.enable = device != "laptop";
   networking.networkmanager = {
     enable = true;
     dns = "systemd-resolved";
@@ -56,6 +54,7 @@
       backend = "iwd";
     };
   };
+  services.openssh.enable = device != "laptop" && device != "wsl";
 
   services.samba.enable = device != "rpi";
   systemd.network.wait-online.enable = false;
