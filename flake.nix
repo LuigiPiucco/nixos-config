@@ -58,6 +58,7 @@
               inputs = inputsPerArch "x86_64-linux";
               device = "laptop";
               mainUser = "luigi";
+              install-cd = false;
             };
             system = "x86_64-linux";
           };
